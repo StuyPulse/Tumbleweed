@@ -9,7 +9,6 @@ import static org.wpilib.units.Units.*;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.units.measure.*;
 
-import dev.doglog.DogLog;
 import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 /** File containing non-subsystem settings for the robot. */
@@ -17,8 +16,8 @@ public interface GlobalSettings {
     Time DT = Milliseconds.of(20);
 
     /**
-     * Uses either a {@link DogLog#tunable(key, value)} or {@link LoggedNetworkBoolean} for each
-     * subsystem to add subsystem toggling functionality from external dashboards.
+     * Uses a {@link LoggedNetworkBoolean} for each subsystem to add subsystem toggling
+     * functionality from external dashboards.
      */
     interface EnabledSubsystems {}
 
