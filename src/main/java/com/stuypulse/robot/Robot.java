@@ -4,13 +4,21 @@
 /**************************************************************/
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.constants.GlobalSettings;
+
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
-import org.wpilib.framework.TimedRobot;
+import org.wpilib.util.Alert;
 
 import java.util.Optional;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 /**
  * Robot Class
@@ -19,7 +27,13 @@ import java.util.Optional;
  * extends TimedRobot, meaning that the methods in this class are called automatically during
  * specific states of the robot.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
+    private static final Alert allianceDisconnectedAlert =
+            new Alert(
+                    "AllianceDisconnected",
+                    "alliance cannot be determined by match state, check FMS",
+                    Alert.Level.MEDIUM);
+
     /**
      * Checks the alliance the robot is on
      *
@@ -29,9 +43,12 @@ public class Robot extends TimedRobot {
     public static boolean isBlue() {
         final Optional<Alliance> alliance = MatchState.getAlliance();
         if (alliance.isPresent()) {
+            allianceDisconnectedAlert.set(false);
             return alliance.get() == Alliance.BLUE;
+        } else {
+            allianceDisconnectedAlert.set(true);
+            return false;
         }
-        return false;
     }
 
     private final RobotContainer robot;
@@ -41,6 +58,23 @@ public class Robot extends TimedRobot {
     public Robot() {
         robot = new RobotContainer();
         defaultScheduler = Scheduler.getDefault();
+
+        switch (GlobalSettings.CURRENT_MODE) {
+            case REAL -> {
+                Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new NT4Publisher());
+            }
+
+            case SIM -> Logger.addDataReceiver(new NT4Publisher());
+
+            case REPLAY -> {
+                setUseTiming(false); // Run as fast as possible
+                String logPath = LogFileUtil.findReplayLog();
+                Logger.setReplaySource(new WPILOGReader(logPath));
+                Logger.addDataReceiver(
+                        new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "replay")));
+            }
+        }
     }
 
     /*************************/

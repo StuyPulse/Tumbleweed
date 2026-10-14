@@ -5,6 +5,7 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.AutonomousRoutines;
+import com.stuypulse.robot.commands.subsystems.DriveCommands;
 import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.generated.TunerConstants;
@@ -16,6 +17,7 @@ import com.stuypulse.robot.subsystems.swerve.Swerve;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandGamepad;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.tunable.Selectable;
 
@@ -81,13 +83,28 @@ public class RobotContainer {
     /*** DEFAULTS ***/
     /****************/
 
-    private void configureDefaultCommands() {}
+    private void configureDefaultCommands() {
+        swerve.setDefaultCommand(
+                DriveCommands.joystickDrive(
+                        swerve,
+                        () -> -driver.getLeftX(),
+                        driver::getLeftY,
+                        () -> -driver.getRightX()));
+    }
 
     /***************/
+
     /*** BUTTONS ***/
     /***************/
 
-    private void configureButtonBindings() {}
+    private void configureButtonBindings() {
+        driver.dpadLeft()
+                .onTrue(
+                        Command.noRequirements(coroutine -> swerve.resetHeading(Rotation2d.ZERO))
+                                .named("Swerve Reset Heading"));
+
+        driver.faceLeft().onTrue(DriveCommands.xMode(swerve));
+    }
 
     /**************/
     /*** AUTONS ***/
