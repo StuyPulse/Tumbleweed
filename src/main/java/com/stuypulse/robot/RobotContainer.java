@@ -12,6 +12,7 @@ import com.stuypulse.robot.generated.TunerConstants;
 import com.stuypulse.robot.subsystems.swerve.GyroIO;
 import com.stuypulse.robot.subsystems.swerve.GyroIOPigeon2;
 import com.stuypulse.robot.subsystems.swerve.ModuleIO;
+import com.stuypulse.robot.subsystems.swerve.ModuleIOSim;
 import com.stuypulse.robot.subsystems.swerve.ModuleIOTalonFX;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 
@@ -52,10 +53,10 @@ public class RobotContainer {
                 swerve =
                         new Swerve(
                                 new GyroIO() {},
-                                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                                new ModuleIOTalonFX(TunerConstants.BackRight));
+                                new ModuleIOSim(TunerConstants.FrontLeft),
+                                new ModuleIOSim(TunerConstants.FrontRight),
+                                new ModuleIOSim(TunerConstants.BackLeft),
+                                new ModuleIOSim(TunerConstants.BackRight));
             }
             default -> {
                 swerve =
