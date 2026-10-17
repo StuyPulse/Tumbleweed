@@ -61,7 +61,7 @@ public class Robot extends LoggedRobot {
 
         switch (GlobalSettings.CURRENT_MODE) {
             case REAL -> {
-                Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new WPILOGWriter("/home/systemcore/logs"));
                 Logger.addDataReceiver(new NT4Publisher());
             }
 
@@ -72,9 +72,11 @@ public class Robot extends LoggedRobot {
                 String logPath = LogFileUtil.findReplayLog();
                 Logger.setReplaySource(new WPILOGReader(logPath));
                 Logger.addDataReceiver(
-                        new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "replay")));
+                        new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_replay")));
             }
         }
+
+        Logger.start();
     }
 
     /*************************/
