@@ -70,6 +70,10 @@ public class Module {
         driveDisconnectedAlert.set(!inputs.driveConnected);
         turnDisconnectedAlert.set(!inputs.turnConnected);
         turnEncoderDisconnectedAlert.set(!inputs.turnEncoderConnected);
+
+        Logger.recordOutput(
+                "Swerve/Module " + index + "/Linear Velocity",
+                inputs.driveVelocityRadPerSec * constants.WheelRadius);
     }
 
     /** Runs the module with the specified setpoint state. Mutates the state to optimize it. */
@@ -77,6 +81,8 @@ public class Module {
         // Optimize velocity setpoint
         state = state.optimize(getAngle());
         state = state.cosineScale(inputs.turnPosition);
+
+        Logger.recordOutput("Swerve/Setpoints/Velocity", state.velocity);
 
         // Apply setpoints
         io.setDriveVelocity(state.velocity / constants.WheelRadius);
