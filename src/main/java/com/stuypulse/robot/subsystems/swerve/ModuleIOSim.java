@@ -78,7 +78,7 @@ public class ModuleIOSim implements ModuleIO {
             driveController.reset();
         }
         if (turnClosedLoop) {
-            turnAppliedVolts = turnController.calculate(turnSim.getAngularVelocity());
+            turnAppliedVolts = turnController.calculate(turnSim.getAngularPosition());
         } else {
             turnController.reset();
         }
