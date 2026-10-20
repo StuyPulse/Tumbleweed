@@ -24,7 +24,7 @@ public interface GlobalSettings {
     interface EnabledSubsystems {}
 
     /** What mode the robot is in when running a simulation. */
-    RobotMode SIMULATION_TASK = RobotMode.REPLAY;
+    RobotMode SIMULATION_TASK = RobotMode.SIM;
 
     RobotMode CURRENT_MODE = RobotBase.isReal() ? RobotMode.REAL : SIMULATION_TASK;
 

@@ -232,6 +232,16 @@ public class Swerve extends PeriodicSubsystem implements SimulatedMechanism {
         }
     }
 
+    public void runSteerCharacterization(double output) {
+        for (int i = 0; i < 4; i++) {
+            modules[i].runTurnCharacterization(output);
+        }
+    }
+
+    public double getSteerCharacterizationPositionRad() {
+        return modules[0].getAngle().getRadians();
+    }
+
     /** Stops the drive. */
     public void stop() {
         runVelocity(new ChassisVelocities());

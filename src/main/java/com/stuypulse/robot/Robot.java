@@ -6,15 +6,15 @@ package com.stuypulse.robot;
 
 import com.stuypulse.robot.constants.GlobalSettings;
 
-import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
+import org.wpilib.framework.OpModeRobot;
 import org.wpilib.util.Alert;
 
 import java.util.Optional;
+import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * extends TimedRobot, meaning that the methods in this class are called automatically during
  * specific states of the robot.
  */
-public class Robot extends LoggedRobot {
+public class Robot extends OpModeRobot {
     private static final Alert allianceDisconnectedAlert =
             new Alert(
                     "AllianceDisconnected",
@@ -53,11 +53,12 @@ public class Robot extends LoggedRobot {
 
     private final RobotContainer robot;
     private final Scheduler defaultScheduler;
-    private Command auto;
 
     public Robot() {
         robot = new RobotContainer();
         defaultScheduler = Scheduler.getDefault();
+
+        Logger.AdvancedHooks.disableRobotBaseCheck();
 
         switch (GlobalSettings.CURRENT_MODE) {
             case REAL -> {
@@ -65,10 +66,12 @@ public class Robot extends LoggedRobot {
                 Logger.addDataReceiver(new NT4Publisher());
             }
 
-            case SIM -> Logger.addDataReceiver(new NT4Publisher());
+            case SIM -> {
+                Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new NT4Publisher());
+            }
 
             case REPLAY -> {
-                setUseTiming(false); // Run as fast as possible
                 String logPath = LogFileUtil.findReplayLog();
                 Logger.setReplaySource(new WPILOGReader(logPath));
                 Logger.addDataReceiver(
@@ -77,6 +80,12 @@ public class Robot extends LoggedRobot {
         }
 
         Logger.start();
+
+        AutoLogOutputManager.addObject(this);
+    }
+
+    public RobotContainer getContainer() {
+        return robot;
     }
 
     /*************************/
@@ -85,67 +94,8 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
+        Logger.AdvancedHooks.invokePeriodicBeforeUser();
         defaultScheduler.run();
+        Logger.AdvancedHooks.invokePeriodicAfterUser(0, 0);
     }
-
-    /*********************/
-    /*** DISABLED MODE ***/
-    /*********************/
-
-    @Override
-    public void disabledInit() {}
-
-    @Override
-    public void disabledPeriodic() {}
-
-    /***********************/
-    /*** AUTONOMOUS MODE ***/
-    /***********************/
-
-    @Override
-    public void autonomousInit() {
-        auto = robot.getAutonomousCommand();
-
-        if (auto != null) {
-            defaultScheduler.schedule(auto);
-        }
-    }
-
-    @Override
-    public void autonomousPeriodic() {}
-
-    @Override
-    public void autonomousExit() {}
-
-    /*******************/
-    /*** TELEOP MODE ***/
-    /*******************/
-
-    @Override
-    public void teleopInit() {
-        if (auto != null) {
-            defaultScheduler.cancel(auto);
-        }
-    }
-
-    @Override
-    public void teleopPeriodic() {}
-
-    @Override
-    public void teleopExit() {}
-
-    /*************************/
-    /*** UTILITY/TEST MODE ***/
-    /*************************/
-
-    @Override
-    public void utilityInit() {
-        defaultScheduler.cancelAll();
-    }
-
-    @Override
-    public void utilityPeriodic() {}
-
-    @Override
-    public void utilityExit() {}
 }

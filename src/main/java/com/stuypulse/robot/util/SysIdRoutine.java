@@ -282,6 +282,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
                 m_recordState.accept(state);
                 co.yield();
               }
+            stopRoutine();    
             })
         .whenCanceled(this::stopRoutine)
         .named("sysid-" + state + "-" + m_mechanism.name);
