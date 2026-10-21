@@ -315,66 +315,79 @@ public interface DriveCommands {
     }
 
     /**
-   * Measures the velocity feedforward constants for the drive motors.
-   *
-   * <p>This command should only be used in voltage control mode.
-   */
-  public static Command feedforwardCharacterization(Swerve drive) {
-    List<Double> velocitySamples = new LinkedList<>();
-    List<Double> voltageSamples = new LinkedList<>();
-    Timer timer = new Timer();
+     * Measures the velocity feedforward constants for the drive motors.
+     *
+     * <p>This command should only be used in voltage control mode.
+     */
+    public static Command feedforwardCharacterization(Swerve drive) {
+        List<Double> velocitySamples = new LinkedList<>();
+        List<Double> voltageSamples = new LinkedList<>();
+        Timer timer = new Timer();
 
-    return Command.sequence(
-        // Reset data
-        Command.noRequirements(
-            coroutine -> {
-              velocitySamples.clear();
-              voltageSamples.clear();
-            }).named("Swerve Characterization Clear Samples"),
+        return Command.sequence(
+                        // Reset data
+                        Command.noRequirements(
+                                        coroutine -> {
+                                            velocitySamples.clear();
+                                            voltageSamples.clear();
+                                        })
+                                .named("Swerve Characterization Clear Samples"),
 
-        // Allow modules to orient
-        drive.runRepeatedly(
-                () -> {
-                  drive.runCharacterization(0.0);
-                }).named("Drive Start Delay")
-            .withTimeout(Seconds.of(1)),
+                        // Allow modules to orient
+                        drive.runRepeatedly(
+                                        () -> {
+                                            drive.runCharacterization(0.0);
+                                        })
+                                .named("Drive Start Delay")
+                                .withTimeout(Seconds.of(1)),
 
-        // Start timer
-        Command.noRequirements(coroutine -> timer.restart()).named("Restart Timer"),
+                        // Start timer
+                        Command.noRequirements(coroutine -> timer.restart()).named("Restart Timer"),
 
-        // Accelerate and gather data
-        drive.runRepeatedly(
-                () -> {
-                  double voltage = timer.get() * 0.1;
-                  drive.runCharacterization(voltage);
-                  velocitySamples.add(drive.getFFCharacterizationVelocity());
-                  voltageSamples.add(voltage);
-                })
+                        // Accelerate and gather data
+                        drive.runRepeatedly(
+                                        () -> {
+                                            double voltage = timer.get() * 0.1;
+                                            drive.runCharacterization(voltage);
+                                            velocitySamples.add(
+                                                    drive.getFFCharacterizationVelocity());
+                                            voltageSamples.add(voltage);
+                                        })
 
-            // When cancelled, calculate and print results
-            .whenCanceled(
-                () -> {
-                  int n = velocitySamples.size();
-                  double sumX = 0.0;
-                  double sumY = 0.0;
-                  double sumXY = 0.0;
-                  double sumX2 = 0.0;
-                  for (int i = 0; i < n; i++) {
-                    sumX += velocitySamples.get(i);
-                    sumY += voltageSamples.get(i);
-                    sumXY += velocitySamples.get(i) * voltageSamples.get(i);
-                    sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
-                  }
-                  double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
-                  double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                                // When cancelled, calculate and print results
+                                .whenCanceled(
+                                        () -> {
+                                            int n = velocitySamples.size();
+                                            double sumX = 0.0;
+                                            double sumY = 0.0;
+                                            double sumXY = 0.0;
+                                            double sumX2 = 0.0;
+                                            for (int i = 0; i < n; i++) {
+                                                sumX += velocitySamples.get(i);
+                                                sumY += voltageSamples.get(i);
+                                                sumXY +=
+                                                        velocitySamples.get(i)
+                                                                * voltageSamples.get(i);
+                                                sumX2 +=
+                                                        velocitySamples.get(i)
+                                                                * velocitySamples.get(i);
+                                            }
+                                            double kS =
+                                                    (sumY * sumX2 - sumX * sumXY)
+                                                            / (n * sumX2 - sumX * sumX);
+                                            double kV =
+                                                    (n * sumXY - sumX * sumY)
+                                                            / (n * sumX2 - sumX * sumX);
 
-                  NumberFormat formatter = new DecimalFormat("#0.00000");
-                  System.out.println("********** Drive FF Characterization Results **********");
-                  System.out.println("\tkS: " + formatter.format(kS));
-                  System.out.println("\tkV: " + formatter.format(kV));
-                }).named("Swerve Run Characterization")).named("Swerve FF Characterization Routine");
-  }
-
+                                            NumberFormat formatter = new DecimalFormat("#0.00000");
+                                            System.out.println(
+                                                    "********** Drive FF Characterization Results **********");
+                                            System.out.println("\tkS: " + formatter.format(kS));
+                                            System.out.println("\tkV: " + formatter.format(kV));
+                                        })
+                                .named("Swerve Run Characterization"))
+                .named("Swerve FF Characterization Routine");
+    }
 
     /** Measures the robot's wheel radius by spinning in a circle. */
     public static Command wheelRadiusCharacterization(Swerve drive) {

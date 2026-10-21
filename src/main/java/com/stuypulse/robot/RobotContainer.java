@@ -19,8 +19,8 @@ import com.stuypulse.robot.subsystems.swerve.Swerve;
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandGamepad;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.tunable.Selectable;
+
+import org.littletonrobotics.junction.networktables.LoggedNetworkChooser;
 
 public class RobotContainer {
 
@@ -34,7 +34,7 @@ public class RobotContainer {
 
     private final Swerve swerve;
     // Autons
-    private static Selectable<Command> autonChooser = new Selectable<>();
+    private static LoggedNetworkChooser<Command> autonChooser = new LoggedNetworkChooser<>("Auton");
 
     // Robot container
 
@@ -111,6 +111,9 @@ public class RobotContainer {
     public void configureAutons() {
         autonChooser.addDefault("Do Nothing", AutonomousRoutines.doNothingAuton());
 
+        autonChooser.add(
+                "Swerve FF Characterization", DriveCommands.feedforwardCharacterization(swerve));
+
         // // Set up SysId routines
         // autonChooser.add(
         //         "Drive Wheel Radius Characterization",
@@ -130,8 +133,6 @@ public class RobotContainer {
         // autonChooser.add(
         //         "Drive SysId (Dynamic Reverse)",
         // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-        Telemetry.log("Autonomous", autonChooser);
     }
 
     /**
