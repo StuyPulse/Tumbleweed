@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public interface DriveCommands {
     public static Command resetPose(final Swerve drive, final Pose2d pose) {
@@ -347,7 +348,7 @@ public interface DriveCommands {
                         // Accelerate and gather data
                         drive.runRepeatedly(
                                         () -> {
-                                            double voltage = timer.get() * 0.1;
+                                            double voltage = timer.get();
                                             drive.runCharacterization(voltage);
                                             velocitySamples.add(
                                                     drive.getFFCharacterizationVelocity());
@@ -378,12 +379,8 @@ public interface DriveCommands {
                                             double kV =
                                                     (n * sumXY - sumX * sumY)
                                                             / (n * sumX2 - sumX * sumX);
-
-                                            NumberFormat formatter = new DecimalFormat("#0.00000");
-                                            System.out.println(
-                                                    "********** Drive FF Characterization Results **********");
-                                            System.out.println("\tkS: " + formatter.format(kS));
-                                            System.out.println("\tkV: " + formatter.format(kV));
+                                            Logger.recordOutput("Swerve/FeedForward Char/kS", kS);
+                                            Logger.recordOutput("Swerve/FeedForward Char/kV", kV);
                                         })
                                 .named("Swerve Run Characterization"))
                 .named("Swerve FF Characterization Routine");

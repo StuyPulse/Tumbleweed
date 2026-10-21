@@ -93,7 +93,11 @@ public class Robot extends LoggedRobot {
     /*********************/
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        if (auto != null) {
+            defaultScheduler.cancel(auto);
+        }
+    }
 
     @Override
     public void disabledPeriodic() {}
