@@ -99,10 +99,7 @@ public class RobotContainer {
     /***************/
 
     private void configureButtonBindings() {
-        driver.dpadLeft()
-                .onTrue(
-                        Command.noRequirements(coroutine -> swerve.resetHeading(Rotation2d.ZERO))
-                                .named("Swerve Reset Heading"));
+        driver.dpadLeft().onTrue(DriveCommands.resetHeading(swerve, Rotation2d.ZERO));
 
         driver.faceLeft().onTrue(DriveCommands.xMode(swerve));
     }
