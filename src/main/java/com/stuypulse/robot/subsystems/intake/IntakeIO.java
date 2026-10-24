@@ -28,13 +28,13 @@ public interface IntakeIO {
     }
 
     class IntakeIORollerOutputs {
-		@AutoLogOutput(key = "Intake/Output Mode")
+        @AutoLogOutput(key = "Intake/Output Mode")
         IntakeIORollerOutputMode outputMode = IntakeIORollerOutputMode.STOP;
 
-		@AutoLogOutput(key = "Intake/Target Duty Cycle")
-		double targetDutyCycle = 0.0;
+        @AutoLogOutput(key = "Intake/Target Duty Cycle")
+        double targetDutyCycle = 0.0;
 
-		@AutoLogOutput(key = "Intake/Target Voltage")
+        @AutoLogOutput(key = "Intake/Target Voltage")
         Voltage targetVoltage = Volts.zero();
     }
 
