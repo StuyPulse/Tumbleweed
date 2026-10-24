@@ -9,10 +9,11 @@ import static org.wpilib.units.Units.*;
 import org.wpilib.units.measure.*;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public interface IntakeIO {
     @AutoLog
-    public static class IntakeIORollerInputs {
+    class IntakeIORollerInputs {
         Current rollerMotorStatorCurrent = Amps.zero();
         Current rollerMotorSupplyCurrent = Amps.zero();
         AngularVelocity rollerMotorAngularVelocity = RPM.zero();
@@ -26,9 +27,14 @@ public interface IntakeIO {
         DUTY_CYCLE
     }
 
-    public class IntakeIORollerOutputs {
+    class IntakeIORollerOutputs {
+		@AutoLogOutput(key = "Intake/Output Mode")
         IntakeIORollerOutputMode outputMode = IntakeIORollerOutputMode.STOP;
-        double targetDutyCycle = 0.0;
+
+		@AutoLogOutput(key = "Intake/Target Duty Cycle")
+		double targetDutyCycle = 0.0;
+
+		@AutoLogOutput(key = "Intake/Target Voltage")
         Voltage targetVoltage = Volts.zero();
     }
 
