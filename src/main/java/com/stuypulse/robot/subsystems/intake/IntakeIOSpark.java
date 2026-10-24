@@ -41,7 +41,7 @@ public class IntakeIOSpark implements IntakeIO {
     }
 
     @Override
-    public void updateInputs(IntakeIORollerInputs inputs) {
+    public void readInputs(IntakeIORollerInputs inputs) {
         inputs.rollerMotorStatorCurrent = Amps.of(rollerMotorStatorCurrent.get());
         inputs.rollerMotorSupplyCurrent = Amps.of(rollerMotorSupplyCurrent.get());
         inputs.rollerMotorAngularVelocity = RPM.of(rollerMotorAngularVelocity.get());

@@ -32,6 +32,7 @@ public interface IntakeConstants {
     interface IntakeGains {}
 
     enum IntakeMotorConfiguration {
+        NEO_1POINT1(DCMotor::getNEO),
         NEO_VORTEX(DCMotor::getNeoVortex),
         KRAKEN_X60(DCMotor::getKrakenX60),
         KRAKEN_X44(DCMotor::getKrakenX44);
@@ -42,11 +43,12 @@ public interface IntakeConstants {
             this.motorGetter = motorGetter;
         }
 
-        public DCMotor getSimMotors(int numMotors) {
-            return motorGetter.apply(numMotors);
+        public DCMotor getSimMotors() {
+            return motorGetter.apply(NUM_MOTORS);
         }
 
         public static final IntakeMotorConfiguration CURRENT_CONFIGURATION = NEO_VORTEX;
+        private static final int NUM_MOTORS = 1;
     }
 
     interface IntakeConfigs {

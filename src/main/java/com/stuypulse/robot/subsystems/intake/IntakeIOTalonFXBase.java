@@ -47,7 +47,7 @@ abstract class IntakeIOTalonFXBase implements IntakeIO {
     }
 
     @Override
-    public void updateInputs(IntakeIORollerInputs inputs) {
+    public void readInputs(IntakeIORollerInputs inputs) {
         BaseStatusSignal.refreshAll(
                 rollerMotorStatorCurrent,
                 rollerMotorSupplyCurrent,

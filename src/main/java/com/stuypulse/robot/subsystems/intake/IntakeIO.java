@@ -38,7 +38,7 @@ public interface IntakeIO {
         Voltage targetVoltage = Volts.zero();
     }
 
-    public default void updateInputs(IntakeIORollerInputs inputs) {}
+    public default void readInputs(IntakeIORollerInputs inputs) {}
 
     public default void applyOutputs(IntakeIORollerOutputs outputs) {}
 }

@@ -25,11 +25,11 @@ public class IntakeIOTalonFXSim extends IntakeIOTalonFXBase {
                 SystemSim.of(
                         new FlywheelSim(
                                 Models.flywheelFromPhysicalConstants(
-                                        IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(
-                                                1),
+                                        IntakeMotorConfiguration.CURRENT_CONFIGURATION
+                                                .getSimMotors(),
                                         IntakeSettings.MOI.in(KilogramSquareMeters),
                                         IntakeSettings.GEAR_RATIO),
-                                IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(1)));
+                                IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors()));
         TalonFXSimulation rollerMotor =
                 new TalonFXSimulation(
                         IntakePorts.ROLLER_MOTOR_PORT, IntakeSettings.GEAR_RATIO, rollerSim);
@@ -39,11 +39,11 @@ public class IntakeIOTalonFXSim extends IntakeIOTalonFXBase {
     }
 
     @Override
-    public void updateInputs(IntakeIORollerInputs inputs) {
+    public void readInputs(IntakeIORollerInputs inputs) {
         rollerSim.update(GlobalSettings.DT);
 
         rollerMotor.refresh();
 
-        super.updateInputs(inputs);
+        super.readInputs(inputs);
     }
 }

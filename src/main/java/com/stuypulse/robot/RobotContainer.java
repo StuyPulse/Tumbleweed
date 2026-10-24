@@ -59,7 +59,7 @@ public class RobotContainer {
                 intake =
                         switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
                             case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXReal());
-                            case NEO_VORTEX -> new Intake(new IntakeIOSpark());
+                            case NEO_1POINT1, NEO_VORTEX -> new Intake(new IntakeIOSpark());
                         };
             }
             case SIM -> {
@@ -73,7 +73,7 @@ public class RobotContainer {
                 intake =
                         switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
                             case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXSim());
-                            case NEO_VORTEX -> new Intake(new IntakeIOSparkSim());
+                            case NEO_1POINT1, NEO_VORTEX -> new Intake(new IntakeIOSparkSim());
                         };
             }
             default -> {

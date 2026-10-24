@@ -71,7 +71,7 @@ public class Intake extends PeriodicSubsystem {
 
     @Override
     protected void periodic() {
-        io.updateInputs(inputs);
+        io.readInputs(inputs);
         Logger.processInputs(getName(), inputs);
 
         if (!GlobalSettings.EnabledSubsystems.INTAKE.get()) {

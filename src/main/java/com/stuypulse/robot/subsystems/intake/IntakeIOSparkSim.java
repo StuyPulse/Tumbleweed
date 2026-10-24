@@ -19,11 +19,11 @@ public class IntakeIOSparkSim extends IntakeIOSpark {
         this.rollerMotorSim =
                 new SparkMaxSim(
                         super.rollerMotor,
-                        IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(1));
+                        IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors());
     }
 
     @Override
-    public void updateInputs(IntakeIORollerInputs inputs) {
+    public void readInputs(IntakeIORollerInputs inputs) {
         inputs.rollerMotorStatorCurrent = Amps.of(rollerMotorSim.getMotorCurrent());
         inputs.rollerMotorSupplyCurrent =
                 Amps.of(
