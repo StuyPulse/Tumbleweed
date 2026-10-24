@@ -9,6 +9,10 @@ import com.stuypulse.robot.commands.subsystems.DriveCommands;
 import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.generated.TunerConstants;
+import com.stuypulse.robot.subsystems.intake.Intake;
+import com.stuypulse.robot.subsystems.intake.IntakeIO;
+import com.stuypulse.robot.subsystems.intake.IntakeIOTalonFXReal;
+import com.stuypulse.robot.subsystems.intake.IntakeIOTalonFXSim;
 import com.stuypulse.robot.subsystems.swerve.GyroIO;
 import com.stuypulse.robot.subsystems.swerve.GyroIOPigeon2;
 import com.stuypulse.robot.subsystems.swerve.ModuleIO;
@@ -33,6 +37,7 @@ public class RobotContainer {
     // Subsystems
 
     private final Swerve swerve;
+    private final Intake intake;
     // Autons
     private static LoggedNetworkChooser<Command> autonChooser = new LoggedNetworkChooser<>("Auton");
 
@@ -48,6 +53,7 @@ public class RobotContainer {
                                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                                 new ModuleIOTalonFX(TunerConstants.BackRight));
+                intake = new Intake(new IntakeIOTalonFXReal());
             }
             case SIM -> {
                 swerve =
@@ -57,6 +63,7 @@ public class RobotContainer {
                                 new ModuleIOSim(TunerConstants.FrontRight),
                                 new ModuleIOSim(TunerConstants.BackLeft),
                                 new ModuleIOSim(TunerConstants.BackRight));
+                intake = new Intake(new IntakeIOTalonFXSim());
             }
             default -> {
                 swerve =
@@ -66,6 +73,7 @@ public class RobotContainer {
                                 new ModuleIO() {},
                                 new ModuleIO() {},
                                 new ModuleIO() {});
+                intake = new Intake(new IntakeIO() {});
             }
         }
         configureLogging();
@@ -102,6 +110,9 @@ public class RobotContainer {
         driver.dpadUp().onTrue(DriveCommands.resetHeading(swerve, Rotation2d.ZERO));
 
         driver.faceLeft().onTrue(DriveCommands.xMode(swerve));
+
+        driver.leftTrigger().whileTrue(intake.commandIntakeIntakeState()).onFalse(intake.commandIntakeStopState());
+        driver.leftBumper().whileTrue(intake.commandIntakeOuttakeState()).onFalse(intake.commandIntakeStopState());
     }
 
     /**************/
