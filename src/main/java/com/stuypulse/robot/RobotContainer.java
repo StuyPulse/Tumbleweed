@@ -56,10 +56,11 @@ public class RobotContainer {
                                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                                 new ModuleIOTalonFX(TunerConstants.BackRight));
-                intake = switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
-                    case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXReal());
-                    case NEO_VORTEX -> new Intake(new IntakeIOSpark());
-                };
+                intake =
+                        switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
+                            case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXReal());
+                            case NEO_VORTEX -> new Intake(new IntakeIOSpark());
+                        };
             }
             case SIM -> {
                 swerve =
@@ -69,10 +70,11 @@ public class RobotContainer {
                                 new ModuleIOSim(TunerConstants.FrontRight),
                                 new ModuleIOSim(TunerConstants.BackLeft),
                                 new ModuleIOSim(TunerConstants.BackRight));
-                intake = switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
-                    case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXSim());
-                    case NEO_VORTEX -> new Intake(new IntakeIOSparkSim());
-                };
+                intake =
+                        switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
+                            case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXSim());
+                            case NEO_VORTEX -> new Intake(new IntakeIOSparkSim());
+                        };
             }
             default -> {
                 swerve =

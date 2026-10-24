@@ -6,16 +6,14 @@ package com.stuypulse.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.*;
 
-import java.util.function.IntFunction;
-
-import org.wpilib.math.system.DCMotor;
-
 import com.stuypulse.robot.util.talonfx.TalonFXConfig;
 
+import org.wpilib.math.system.DCMotor;
 import org.wpilib.units.measure.*;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import java.util.function.IntFunction;
 
 public interface IntakeConstants {
     interface IntakeSettings {
@@ -34,7 +32,9 @@ public interface IntakeConstants {
     interface IntakeGains {}
 
     enum IntakeMotorConfiguration {
-        NEO_VORTEX(DCMotor::getNeoVortex), KRAKEN_X60(DCMotor::getKrakenX60), KRAKEN_X44(DCMotor::getKrakenX44);
+        NEO_VORTEX(DCMotor::getNeoVortex),
+        KRAKEN_X60(DCMotor::getKrakenX60),
+        KRAKEN_X44(DCMotor::getKrakenX44);
 
         private final IntFunction<DCMotor> motorGetter;
 

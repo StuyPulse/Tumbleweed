@@ -25,7 +25,8 @@ public class IntakeIOTalonFXSim extends IntakeIOTalonFXBase {
                 SystemSim.of(
                         new FlywheelSim(
                                 Models.flywheelFromPhysicalConstants(
-                                        IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(1),
+                                        IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(
+                                                1),
                                         IntakeSettings.MOI.in(KilogramSquareMeters),
                                         IntakeSettings.GEAR_RATIO),
                                 IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(1)));

@@ -120,7 +120,7 @@ tasks.withType(JavaCompile) {
 
 project.compileJava.dependsOn(spotlessApply)
 spotless {
-    enforceCheck = false
+    enforceCheck = true 
     java {
         targetExclude("src/main/java/com/stuypulse/robot/commands/autons/*.java")
         

@@ -6,13 +6,13 @@ package com.stuypulse.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.*;
 
-import java.util.function.Supplier;
-
 import org.wpilib.hardware.bus.CANPort;
 
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.util.Signal;
+
+import java.util.function.Supplier;
 
 public class IntakeIOSpark implements IntakeIO {
     protected final SparkMax rollerMotor;
@@ -24,10 +24,17 @@ public class IntakeIOSpark implements IntakeIO {
     private final Signal<Double> rollerMotorAppliedVoltage;
 
     public IntakeIOSpark() {
-        this.rollerMotor = new SparkMax(CANPort.CAN_S1, IntakeConstants.IntakePorts.ROLLER_MOTOR_PORT, MotorType.kBrushless);
+        this.rollerMotor =
+                new SparkMax(
+                        CANPort.CAN_S1,
+                        IntakeConstants.IntakePorts.ROLLER_MOTOR_PORT,
+                        MotorType.kBrushless);
 
         this.rollerMotorStatorCurrent = rollerMotor.getOutputCurrent();
-        this.rollerMotorSupplyCurrent = () -> rollerMotorStatorCurrent.get() * Math.abs(rollerMotor.getAppliedOutput().get()); // gg
+        this.rollerMotorSupplyCurrent =
+                () ->
+                        rollerMotorStatorCurrent.get()
+                                * Math.abs(rollerMotor.getAppliedOutput().get()); // gg
         this.rollerMotorAngularVelocity = rollerMotor.getAbsoluteEncoder().getVelocity();
         this.rollerMotorTemperature = rollerMotor.getMotorTemperature();
         this.rollerMotorAppliedVoltage = rollerMotor.getBusVoltage();
@@ -44,7 +51,7 @@ public class IntakeIOSpark implements IntakeIO {
 
     @Override
     public void applyOutputs(IntakeIORollerOutputs outputs) {
-        switch(outputs.outputMode) {
+        switch (outputs.outputMode) {
             case STOP -> rollerMotor.stopMotor();
             case DUTY_CYCLE -> rollerMotor.setThrottle(outputs.targetDutyCycle);
             case VOLTAGE -> rollerMotor.setVoltage(outputs.targetVoltage);
