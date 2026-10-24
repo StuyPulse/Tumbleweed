@@ -10,10 +10,11 @@ import com.stuypulse.robot.subsystems.intake.IntakeIO.IntakeIORollerOutputMode;
 import com.stuypulse.robot.subsystems.intake.IntakeIO.IntakeIORollerOutputs;
 import com.stuypulse.robot.util.PeriodicSubsystem;
 
-import org.littletonrobotics.junction.AutoLogOutput;
-import org.littletonrobotics.junction.Logger;
 import org.wpilib.command3.Command;
 import org.wpilib.units.measure.Voltage;
+
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends PeriodicSubsystem {
     private final IntakeIO io;

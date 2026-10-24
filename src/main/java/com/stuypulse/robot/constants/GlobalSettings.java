@@ -22,7 +22,8 @@ public interface GlobalSettings {
      * functionality from external dashboards.
      */
     interface EnabledSubsystems {
-        LoggedNetworkBoolean INTAKE = new LoggedNetworkBoolean("/Tuning/EnabledSubsystems/Intake", true);
+        LoggedNetworkBoolean INTAKE =
+                new LoggedNetworkBoolean("/Tuning/EnabledSubsystems/Intake", true);
     }
 
     /** What mode the robot is in when running a simulation. */

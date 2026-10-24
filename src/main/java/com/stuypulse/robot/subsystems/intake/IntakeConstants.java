@@ -22,7 +22,7 @@ public interface IntakeConstants {
         Voltage STOP_VOLTAGE = Volts.zero();
         Voltage INTAKE_VOLTAGE = Volts.of(12.0);
 
-        double GEAR_RATIO = 1 / 1; // placeholder
+        double GEAR_RATIO = 1.0 / 1.0; // placeholder
         Current STATOR_LIMIT = Amps.of(60);
         MomentOfInertia MOI = KilogramSquareMeters.of(0.0);
     }

@@ -19,5 +19,6 @@ public interface GlobalPorts {
         int DEBUGGER = 2;
     }
 
-    CANBus INTAKE_CANBUS = new CANBus(CANPort.CAN_S1);
+    // don't instantiate CAN_S0, taken by swerve
+    CANBus CAN_S1 = new CANBus(CANPort.CAN_S1);
 }

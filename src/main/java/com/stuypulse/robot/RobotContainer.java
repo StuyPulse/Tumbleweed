@@ -111,8 +111,12 @@ public class RobotContainer {
 
         driver.faceLeft().onTrue(DriveCommands.xMode(swerve));
 
-        driver.leftTrigger().whileTrue(intake.commandIntakeIntakeState()).onFalse(intake.commandIntakeStopState());
-        driver.leftBumper().whileTrue(intake.commandIntakeOuttakeState()).onFalse(intake.commandIntakeStopState());
+        driver.leftTrigger()
+                .whileTrue(intake.commandIntakeIntakeState())
+                .onFalse(intake.commandIntakeStopState());
+        driver.leftBumper()
+                .whileTrue(intake.commandIntakeOuttakeState())
+                .onFalse(intake.commandIntakeStopState());
     }
 
     /**************/

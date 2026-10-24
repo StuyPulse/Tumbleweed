@@ -11,6 +11,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 public class IntakeIOTalonFXReal extends IntakeIOTalonFXBase {
     public IntakeIOTalonFXReal() {
-        super(new TalonFX(IntakePorts.ROLLER_MOTOR_PORT, GlobalPorts.INTAKE_CANBUS));
+        super(new TalonFX(IntakePorts.ROLLER_MOTOR_PORT, GlobalPorts.CAN_S1));
     }
 }
