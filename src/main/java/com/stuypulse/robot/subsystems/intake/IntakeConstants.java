@@ -6,6 +6,10 @@ package com.stuypulse.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.*;
 
+import java.util.function.IntFunction;
+
+import org.wpilib.math.system.DCMotor;
+
 import com.stuypulse.robot.util.talonfx.TalonFXConfig;
 
 import org.wpilib.units.measure.*;
@@ -28,6 +32,22 @@ public interface IntakeConstants {
     }
 
     interface IntakeGains {}
+
+    enum IntakeMotorConfiguration {
+        NEO_VORTEX(DCMotor::getNeoVortex), KRAKEN_X60(DCMotor::getKrakenX60), KRAKEN_X44(DCMotor::getKrakenX44);
+
+        private final IntFunction<DCMotor> motorGetter;
+
+        private IntakeMotorConfiguration(IntFunction<DCMotor> motorGetter) {
+            this.motorGetter = motorGetter;
+        }
+
+        public DCMotor getSimMotors(int numMotors) {
+            return motorGetter.apply(numMotors);
+        }
+
+        public static final IntakeMotorConfiguration CURRENT_CONFIGURATION = NEO_VORTEX;
+    }
 
     interface IntakeConfigs {
         TalonFXConfig ROLLER_MOTOR_CONFIG =

@@ -10,7 +10,10 @@ import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.generated.TunerConstants;
 import com.stuypulse.robot.subsystems.intake.Intake;
+import com.stuypulse.robot.subsystems.intake.IntakeConstants;
 import com.stuypulse.robot.subsystems.intake.IntakeIO;
+import com.stuypulse.robot.subsystems.intake.IntakeIOSpark;
+import com.stuypulse.robot.subsystems.intake.IntakeIOSparkSim;
 import com.stuypulse.robot.subsystems.intake.IntakeIOTalonFXReal;
 import com.stuypulse.robot.subsystems.intake.IntakeIOTalonFXSim;
 import com.stuypulse.robot.subsystems.swerve.GyroIO;
@@ -53,7 +56,10 @@ public class RobotContainer {
                                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                                 new ModuleIOTalonFX(TunerConstants.BackRight));
-                intake = new Intake(new IntakeIOTalonFXReal());
+                intake = switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
+                    case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXReal());
+                    case NEO_VORTEX -> new Intake(new IntakeIOSpark());
+                };
             }
             case SIM -> {
                 swerve =
@@ -63,7 +69,10 @@ public class RobotContainer {
                                 new ModuleIOSim(TunerConstants.FrontRight),
                                 new ModuleIOSim(TunerConstants.BackLeft),
                                 new ModuleIOSim(TunerConstants.BackRight));
-                intake = new Intake(new IntakeIOTalonFXSim());
+                intake = switch (IntakeConstants.IntakeMotorConfiguration.CURRENT_CONFIGURATION) {
+                    case KRAKEN_X60, KRAKEN_X44 -> new Intake(new IntakeIOTalonFXSim());
+                    case NEO_VORTEX -> new Intake(new IntakeIOSparkSim());
+                };
             }
             default -> {
                 swerve =

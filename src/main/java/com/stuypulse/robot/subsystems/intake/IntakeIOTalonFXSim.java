@@ -7,12 +7,12 @@ package com.stuypulse.robot.subsystems.intake;
 import static org.wpilib.units.Units.KilogramSquareMeters;
 
 import com.stuypulse.robot.constants.GlobalSettings;
+import com.stuypulse.robot.subsystems.intake.IntakeConstants.IntakeMotorConfiguration;
 import com.stuypulse.robot.subsystems.intake.IntakeConstants.IntakePorts;
 import com.stuypulse.robot.subsystems.intake.IntakeConstants.IntakeSettings;
 import com.stuypulse.robot.util.talonfx.sim.SystemSim;
 import com.stuypulse.robot.util.talonfx.sim.TalonFXSimulation;
 
-import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Models;
 import org.wpilib.simulation.FlywheelSim;
 
@@ -25,10 +25,10 @@ public class IntakeIOTalonFXSim extends IntakeIOTalonFXBase {
                 SystemSim.of(
                         new FlywheelSim(
                                 Models.flywheelFromPhysicalConstants(
-                                        DCMotor.getKrakenX60Foc(1),
+                                        IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(1),
                                         IntakeSettings.MOI.in(KilogramSquareMeters),
                                         IntakeSettings.GEAR_RATIO),
-                                DCMotor.getKrakenX60Foc(1)));
+                                IntakeMotorConfiguration.CURRENT_CONFIGURATION.getSimMotors(1)));
         TalonFXSimulation rollerMotor =
                 new TalonFXSimulation(
                         IntakePorts.ROLLER_MOTOR_PORT, IntakeSettings.GEAR_RATIO, rollerSim);
