@@ -8,13 +8,9 @@ import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.math.geometry.Rotation2d;
 
 import java.util.Queue;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class GyroIOOnboard implements GyroIO {
     private final OnboardIMU imu;
-    private final Supplier<Rotation2d> yawSignal;
-    private final DoubleSupplier yawVelocitySignal;
     private final Queue<Double> yawPositionQueue;
     private final Queue<Double> yawTimestampQueue;
 
@@ -23,11 +19,9 @@ public class GyroIOOnboard implements GyroIO {
 
         imu.resetYaw();
 
-        yawSignal = imu::getRotation2d;
-        yawVelocitySignal = imu::getGyroRateZ;
         yawPositionQueue =
                 PhoenixOdometryThread.getInstance()
-                        .registerSignal(() -> yawSignal.get().getDegrees());
+                        .registerSignal(() -> imu.getRotation2d().getDegrees());
         yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
     }
 
@@ -36,8 +30,8 @@ public class GyroIOOnboard implements GyroIO {
         // The imu is directly on the systemcore, so if the imu fails then the whole systemcore is
         // likely failing
         inputs.connected = true;
-        inputs.yawPosition = yawSignal.get();
-        inputs.yawVelocityRadPerSec = yawVelocitySignal.getAsDouble();
+        inputs.yawPosition = imu.getRotation2d();
+        inputs.yawVelocityRadPerSec = imu.getGyroRateZ();
 
         inputs.odometryYawTimestamps =
                 yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
