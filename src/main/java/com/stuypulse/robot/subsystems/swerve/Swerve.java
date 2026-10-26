@@ -63,7 +63,9 @@ public class Swerve extends PeriodicSubsystem implements SimulatedMechanism {
 
     static final Lock odometryLock = new ReentrantLock();
     private final GyroIO gyroIO;
+    private final GyroIO secondaryGyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+    private final GyroIOInputsAutoLogged secondaryGyroInputs = new GyroIOInputsAutoLogged();
     private final Module[] modules = new Module[4]; // FL, FR, BL, BR
     private final Alert gyroDisconnectedAlert =
             new Alert(
@@ -90,14 +92,15 @@ public class Swerve extends PeriodicSubsystem implements SimulatedMechanism {
             ModuleIO flModuleIO,
             ModuleIO frModuleIO,
             ModuleIO blModuleIO,
-            ModuleIO brModuleIO) {
+            ModuleIO brModuleIO,
+            GyroIO secondaryGyroIO) {
         this.gyroIO = gyroIO;
         modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
         modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
         modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
         modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
         this.sysId = new SysIdRoutineLog("SwerveSysId");
-
+        this.secondaryGyroIO = secondaryGyroIO;
         // Usage reporting for swerve template
         HAL.reportUsage("RobotDrive", "AdvantageKit Swerve");
 
@@ -141,6 +144,8 @@ public class Swerve extends PeriodicSubsystem implements SimulatedMechanism {
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
+        secondaryGyroIO.updateInputs(secondaryGyroInputs);
+        Logger.processInputs("Drive/SecondaryGyro", secondaryGyroInputs);
         for (var module : modules) {
             module.periodic();
         }

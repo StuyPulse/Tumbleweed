@@ -16,8 +16,6 @@ import com.stuypulse.robot.subsystems.swerve.ModuleIO;
 import com.stuypulse.robot.subsystems.swerve.ModuleIOSim;
 import com.stuypulse.robot.subsystems.swerve.ModuleIOTalonFX;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants;
-import com.stuypulse.robot.subsystems.swerve.SwerveConstants.GyroType;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandGamepad;
@@ -46,13 +44,12 @@ public class RobotContainer {
             case REAL -> {
                 swerve =
                         new Swerve(
-                                SwerveConstants.Gyro.GYRO_TYPE == GyroType.PIGEON_2
-                                        ? new GyroIOPigeon2()
-                                        : new GyroIOOnboard(),
+                                new GyroIOPigeon2(),
                                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
                                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                                 new ModuleIOTalonFX(TunerConstants.BackLeft),
-                                new ModuleIOTalonFX(TunerConstants.BackRight));
+                                new ModuleIOTalonFX(TunerConstants.BackRight),
+                                new GyroIOOnboard());
             }
             case SIM -> {
                 swerve =
@@ -61,7 +58,8 @@ public class RobotContainer {
                                 new ModuleIOSim(TunerConstants.FrontLeft),
                                 new ModuleIOSim(TunerConstants.FrontRight),
                                 new ModuleIOSim(TunerConstants.BackLeft),
-                                new ModuleIOSim(TunerConstants.BackRight));
+                                new ModuleIOSim(TunerConstants.BackRight),
+                                new GyroIO() {});
             }
             default -> {
                 swerve =
@@ -70,7 +68,8 @@ public class RobotContainer {
                                 new ModuleIO() {},
                                 new ModuleIO() {},
                                 new ModuleIO() {},
-                                new ModuleIO() {});
+                                new ModuleIO() {},
+                                new GyroIO() {});
             }
         }
         configureLogging();
