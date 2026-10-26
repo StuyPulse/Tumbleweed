@@ -10,11 +10,14 @@ import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.generated.TunerConstants;
 import com.stuypulse.robot.subsystems.swerve.GyroIO;
+import com.stuypulse.robot.subsystems.swerve.GyroIOOnboard;
 import com.stuypulse.robot.subsystems.swerve.GyroIOPigeon2;
 import com.stuypulse.robot.subsystems.swerve.ModuleIO;
 import com.stuypulse.robot.subsystems.swerve.ModuleIOSim;
 import com.stuypulse.robot.subsystems.swerve.ModuleIOTalonFX;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
+import com.stuypulse.robot.subsystems.swerve.SwerveConstants;
+import com.stuypulse.robot.subsystems.swerve.SwerveConstants.GyroType;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.button.CommandGamepad;
@@ -43,7 +46,9 @@ public class RobotContainer {
             case REAL -> {
                 swerve =
                         new Swerve(
-                                new GyroIOPigeon2(),
+                                SwerveConstants.Gyro.GYRO_TYPE == GyroType.PIGEON_2
+                                        ? new GyroIOPigeon2()
+                                        : new GyroIOOnboard(),
                                 new ModuleIOTalonFX(TunerConstants.FrontLeft),
                                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                                 new ModuleIOTalonFX(TunerConstants.BackLeft),

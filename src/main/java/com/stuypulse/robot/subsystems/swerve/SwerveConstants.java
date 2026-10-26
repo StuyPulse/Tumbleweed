@@ -6,6 +6,7 @@ package com.stuypulse.robot.subsystems.swerve;
 
 import static org.wpilib.units.Units.*;
 
+import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
 import org.wpilib.units.measure.*;
 
 public interface SwerveConstants {
@@ -31,5 +32,15 @@ public interface SwerveConstants {
 
         double WHEEL_RADIUS_MAX_VELOCITY = 0.25;
         double WHEEL_RADIUS_RAMP_RATE = 0.05;
+    }
+
+    enum GyroType {
+        PIGEON_2,
+        ONBOARD_IMU
+    }
+
+    public interface Gyro {
+        MountOrientation SYSCORE_MOUNT_ORIENTATION = MountOrientation.FLAT;
+        GyroType GYRO_TYPE = GyroType.PIGEON_2;
     }
 }
