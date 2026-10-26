@@ -346,7 +346,9 @@ public interface DriveCommands {
                                     drive.runCharacterization(voltage);
                                     velocitySamples.add(drive.getFFCharacterizationVelocity());
                                     voltageSamples.add(voltage);
-                                }).whenCanceled(() -> {
+                                })
+                        .whenCanceled(
+                                () -> {
                                     int n = velocitySamples.size();
                                     double sumX = 0.0;
                                     double sumY = 0.0;

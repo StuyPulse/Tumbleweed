@@ -19,9 +19,7 @@ import org.wpilib.opmode.Utility;
 
 import org.littletonrobotics.junction.Logger;
 
-@Utility(
-        name = "Dynamic Forward",
-        group = "SysId")
+@Utility(name = "Dynamic Forward", group = "SysId")
 public class SwerveDynamicForward implements OpMode {
     private final Swerve swerve;
     private final Command routine;

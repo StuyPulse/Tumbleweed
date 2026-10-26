@@ -1,3 +1,7 @@
+/********************* PROJECT TUMBLEWEED *********************/
+/* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
+/* This work is licensed under the terms of the MIT license.  */
+/**************************************************************/
 package com.stuypulse.robot.opmodes.sysid;
 
 import com.stuypulse.robot.Robot;
@@ -10,28 +14,27 @@ import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.Utility;
 
 @Utility(
-   name = "Swerve FF Characterization",
-   group = "SysId",
-   description = "Swerve FeedForward characterization routine made by 6328"
-)
+        name = "Swerve FF Characterization",
+        group = "SysId",
+        description = "Swerve FeedForward characterization routine made by 6328")
 public class SwerveFFCharacterization implements OpMode {
-   private final Swerve swerve;
-   
-   private final Command command;
+    private final Swerve swerve;
 
-   public SwerveFFCharacterization(Robot robot) {
+    private final Command command;
+
+    public SwerveFFCharacterization(Robot robot) {
         swerve = robot.getContainer().getSwerve();
-        
+
         command = DriveCommands.feedforwardCharacterization(swerve);
-   }
+    }
 
-   @Override 
-   public void start() {
-       Scheduler.getDefault().schedule(command);
-   }
+    @Override
+    public void start() {
+        Scheduler.getDefault().schedule(command);
+    }
 
-   @Override 
-   public void end() {
-       Scheduler.getDefault().cancel(command);
-   }
+    @Override
+    public void end() {
+        Scheduler.getDefault().cancel(command);
+    }
 }

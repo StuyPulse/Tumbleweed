@@ -19,9 +19,7 @@ import org.wpilib.opmode.Utility;
 
 import org.littletonrobotics.junction.Logger;
 
-@Utility(
-        name = "Quasistatic Forward",
-        group = "SysId")
+@Utility(name = "Quasistatic Forward", group = "SysId")
 public class SwerveQuasistaticForward implements OpMode {
     private final Swerve swerve;
     private final Command routine;
