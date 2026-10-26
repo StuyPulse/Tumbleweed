@@ -93,8 +93,8 @@ public class RobotContainer {
         swerve.setDefaultCommand(
                 DriveCommands.joystickDrive(
                         swerve,
-                        () -> -driver.getLeftY(),
-                        driver::getLeftX,
+                        driver::getLeftY,
+                        () -> -driver.getLeftX(),
                         () -> -driver.getRightX()));
     }
 
