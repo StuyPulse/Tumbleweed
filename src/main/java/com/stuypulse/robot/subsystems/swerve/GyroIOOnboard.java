@@ -5,7 +5,6 @@
 package com.stuypulse.robot.subsystems.swerve;
 
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
 import org.wpilib.math.geometry.Rotation2d;
 
 import java.util.Queue;
@@ -20,7 +19,7 @@ public class GyroIOOnboard implements GyroIO {
     private final Queue<Double> yawTimestampQueue;
 
     public GyroIOOnboard() {
-        imu = new OnboardIMU(MountOrientation.FLAT);
+        imu = new OnboardIMU(SwerveConstants.Gyro.SYSCORE_MOUNT_ORIENTATION);
 
         imu.resetYaw();
 
@@ -34,6 +33,9 @@ public class GyroIOOnboard implements GyroIO {
 
     @Override
     public void updateInputs(GyroIOInputs inputs) {
+        // The imu is directly on the systemcore, so if the imu fails then the whole systemcore is
+        // likely failing
+        inputs.connected = true;
         inputs.yawPosition = yawSignal.get();
         inputs.yawVelocityRadPerSec = yawVelocitySignal.getAsDouble();
 
