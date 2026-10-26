@@ -346,12 +346,7 @@ public interface DriveCommands {
                                     drive.runCharacterization(voltage);
                                     velocitySamples.add(drive.getFFCharacterizationVelocity());
                                     voltageSamples.add(voltage);
-                                })
-                        .named("Accelerate and gather data");
-
-        Command calculate =
-                drive.run(
-                                coroutine -> {
+                                }).whenCanceled(() -> {
                                     int n = velocitySamples.size();
                                     double sumX = 0.0;
                                     double sumY = 0.0;
@@ -375,13 +370,12 @@ public interface DriveCommands {
                                     System.out.println("\tkS: " + formatter.format(kS));
                                     System.out.println("\tkV: " + formatter.format(kV));
                                 })
-                        .named("Calculate results");
+                        .named("Accelerate and gather data");
 
         return resetData
                 .andThen(orientModules)
                 .andThen(startTimer)
                 .andThen(accelerateAndGatherData)
-                .andThen(calculate)
                 .named("Joystick Swerve Angle");
     }
 

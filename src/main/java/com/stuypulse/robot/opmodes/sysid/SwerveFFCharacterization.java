@@ -1,8 +1,11 @@
 package com.stuypulse.robot.opmodes.sysid;
 
 import com.stuypulse.robot.Robot;
+import com.stuypulse.robot.commands.subsystems.DriveCommands;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Scheduler;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.Utility;
 
@@ -14,7 +17,21 @@ import org.wpilib.opmode.Utility;
 public class SwerveFFCharacterization implements OpMode {
    private final Swerve swerve;
    
+   private final Command command;
+
    public SwerveFFCharacterization(Robot robot) {
         swerve = robot.getContainer().getSwerve();
+        
+        command = DriveCommands.feedforwardCharacterization(swerve);
+   }
+
+   @Override 
+   public void start() {
+       Scheduler.getDefault().schedule(command);
+   }
+
+   @Override 
+   public void end() {
+       Scheduler.getDefault().cancel(command);
    }
 }
