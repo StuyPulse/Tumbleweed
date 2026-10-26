@@ -26,7 +26,7 @@ public class SwerveDynamicForward implements OpMode {
     private final Swerve swerve;
     private final Command routine;
 
-    public SwerveDynamicForward(Robot robot, Command sysIdCommand) {
+    public SwerveDynamicForward(Robot robot) {
         swerve = robot.getContainer().getSwerve();
 
         SysIdRoutine.Config config =

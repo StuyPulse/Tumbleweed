@@ -26,7 +26,7 @@ public class SwerveDynamicReverse implements OpMode {
     private final Swerve swerve;
     private final Command routine;
 
-    public SwerveDynamicReverse(Robot robot, Command sysIdCommand) {
+    public SwerveDynamicReverse(Robot robot) {
         swerve = robot.getContainer().getSwerve();
 
         SysIdRoutine.Config config =

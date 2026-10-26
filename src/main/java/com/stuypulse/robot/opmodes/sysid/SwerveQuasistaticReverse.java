@@ -26,7 +26,7 @@ public class SwerveQuasistaticReverse implements OpMode {
     private final Swerve swerve;
     private final Command routine;
 
-    public SwerveQuasistaticReverse(Robot robot, Command sysIdCommand) {
+    public SwerveQuasistaticReverse(Robot robot) {
         swerve = robot.getContainer().getSwerve();
 
         SysIdRoutine.Config config =

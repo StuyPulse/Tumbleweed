@@ -26,7 +26,7 @@ public class SwerveQuasistaticForward implements OpMode {
     private final Swerve swerve;
     private final Command routine;
 
-    public SwerveQuasistaticForward(Robot robot, Command sysIdCommand) {
+    public SwerveQuasistaticForward(Robot robot) {
         swerve = robot.getContainer().getSwerve();
 
         SysIdRoutine.Config config =
