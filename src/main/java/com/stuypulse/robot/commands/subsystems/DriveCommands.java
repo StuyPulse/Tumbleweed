@@ -9,7 +9,6 @@ import static org.wpilib.units.Units.Seconds;
 import com.stuypulse.robot.constants.GlobalSettings.DriverConstants;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 
-import org.littletonrobotics.junction.Logger;
 import org.wpilib.command3.*;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
@@ -31,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public interface DriveCommands {
     public static Command resetPose(final Swerve drive, final Pose2d pose) {
@@ -341,8 +341,8 @@ public interface DriveCommands {
         Command startTimer = drive.run(coroutine -> timer.restart()).named("Start timer");
 
         Command accelerateAndGatherData =
-                drive.run(
-                                coroutine -> {
+                drive.runRepeatedly(
+                                () -> {
                                     double voltage = timer.get() * DriverConstants.FF_RAMP_RATE;
                                     drive.runCharacterization(voltage);
                                     velocitySamples.add(drive.getFFCharacterizationVelocity());
@@ -369,7 +369,7 @@ public interface DriveCommands {
 
                                     Logger.recordOutput("Swerve/FF Char/kS", kS);
                                     Logger.recordOutput("Swerve/FF Char/kV", kV);
-                               })
+                                })
                         .named("Accelerate and gather data");
 
         return resetData

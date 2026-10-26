@@ -95,7 +95,7 @@ public interface GlobalSettings {
         double ANGLE_MAX_VELOCITY = 8.0;
         double ANGLE_MAX_ACCELERATION = 20.0;
         Time FF_START_DELAY = Seconds.of(2.0); // Secs
-        double FF_RAMP_RATE = 0.1; // Volts/Sec
+        double FF_RAMP_RATE = 1; // Volts/Sec
         double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
         double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
     }

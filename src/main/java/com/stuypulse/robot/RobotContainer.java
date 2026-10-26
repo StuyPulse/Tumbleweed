@@ -93,7 +93,7 @@ public class RobotContainer {
                 DriveCommands.joystickDrive(
                         swerve,
                         driver::getLeftY,
-                        () -> -driver.getLeftX(),
+                        driver::getLeftX,
                         () -> -driver.getRightX()));
     }
 
