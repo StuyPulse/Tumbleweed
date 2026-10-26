@@ -334,7 +334,7 @@ public interface DriveCommands {
                         .named("Reset data");
 
         Command orientModules =
-                drive.run(coroutine -> drive.runCharacterization(0.0))
+                drive.runRepeatedly(() -> drive.runCharacterization(0.0))
                         .named("Orient modules")
                         .withTimeout(DriverConstants.FF_START_DELAY);
 
@@ -376,7 +376,7 @@ public interface DriveCommands {
                 .andThen(orientModules)
                 .andThen(startTimer)
                 .andThen(accelerateAndGatherData)
-                .named("Joystick Swerve Angle");
+                .named("Swerve FF Characterization");
     }
 
     /** Measures the robot's wheel radius by spinning in a circle. */
