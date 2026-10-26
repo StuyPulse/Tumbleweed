@@ -9,6 +9,7 @@ import static org.wpilib.units.Units.Seconds;
 import com.stuypulse.robot.constants.GlobalSettings.DriverConstants;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 
+import org.littletonrobotics.junction.Logger;
 import org.wpilib.command3.*;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
@@ -366,12 +367,9 @@ public interface DriveCommands {
                                     double kV =
                                             (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 
-                                    NumberFormat formatter = new DecimalFormat("#0.00000");
-                                    System.out.println(
-                                            "********** Swerve FF Characterization Results **********");
-                                    System.out.println("\tkS: " + formatter.format(kS));
-                                    System.out.println("\tkV: " + formatter.format(kV));
-                                })
+                                    Logger.recordOutput("Swerve/FF Char/kS", kS);
+                                    Logger.recordOutput("Swerve/FF Char/kV", kV);
+                               })
                         .named("Accelerate and gather data");
 
         return resetData
