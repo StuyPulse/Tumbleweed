@@ -2,7 +2,7 @@
 /* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
 /* This work is licensed under the terms of the MIT license.  */
 /**************************************************************/
-package com.stuypulse.robot.opmodes.sysid;
+package com.stuypulse.robot.opmodes.characterization;
 
 import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.commands.subsystems.DriveCommands;
@@ -15,7 +15,7 @@ import org.wpilib.opmode.Utility;
 
 @Utility(
         name = "Swerve FF Characterization",
-        group = "SysId",
+        group = "Characterization",
         description = "Swerve FeedForward characterization routine made by 6328")
 public class SwerveFFCharacterization implements OpMode {
     private final Swerve swerve;
