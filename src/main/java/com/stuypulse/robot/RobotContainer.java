@@ -141,6 +141,10 @@ public class RobotContainer {
         Telemetry.log("Autonomous", autonChooser);
     }
 
+    public Swerve getSwerve() {
+        return swerve;
+    }
+
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
