@@ -19,9 +19,7 @@ import org.wpilib.opmode.Utility;
 
 import org.littletonrobotics.junction.Logger;
 
-@Utility(
-        name = "Quasistatic Reverse",
-        group = "SysId")
+@Utility(name = "Quasistatic Reverse", group = "SysId")
 public class SwerveQuasistaticReverse implements OpMode {
     private final Swerve swerve;
     private final Command routine;

@@ -19,9 +19,7 @@ import org.wpilib.opmode.Utility;
 
 import org.littletonrobotics.junction.Logger;
 
-@Utility(
-        name = "Dynamic Reverse",
-        group = "SysId")
+@Utility(name = "Dynamic Reverse", group = "SysId")
 public class SwerveDynamicReverse implements OpMode {
     private final Swerve swerve;
     private final Command routine;
