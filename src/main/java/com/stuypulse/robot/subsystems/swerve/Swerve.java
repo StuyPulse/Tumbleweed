@@ -27,7 +27,6 @@ import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
-import org.wpilib.sysid.SysIdRoutineLog;
 import org.wpilib.util.Alert;
 
 import java.util.Optional;
@@ -74,7 +73,6 @@ public class Swerve extends PeriodicSubsystem implements SimulatedMechanism {
                     Alert.Level.HIGH);
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-    private final SysIdRoutineLog sysId;
     private Rotation2d rawGyroRotation = Rotation2d.ZERO;
     private SwerveModulePosition[] lastModulePositions = // For delta tracking
             new SwerveModulePosition[] {
@@ -99,7 +97,6 @@ public class Swerve extends PeriodicSubsystem implements SimulatedMechanism {
         modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
         modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
         modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
-        this.sysId = new SysIdRoutineLog("SwerveSysId");
         this.secondaryGyroIO = secondaryGyroIO;
         // Usage reporting for swerve template
         HAL.reportUsage("RobotDrive", "AdvantageKit Swerve");
