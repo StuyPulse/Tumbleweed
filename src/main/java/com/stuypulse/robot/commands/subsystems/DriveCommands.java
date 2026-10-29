@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public interface DriveCommands {
     public static Command resetPose(final Swerve drive, final Pose2d pose) {
@@ -333,25 +334,22 @@ public interface DriveCommands {
                         .named("Reset data");
 
         Command orientModules =
-                drive.run(coroutine -> drive.runCharacterization(0.0))
+                drive.runRepeatedly(() -> drive.runCharacterization(0.0))
                         .named("Orient modules")
                         .withTimeout(DriverConstants.FF_START_DELAY);
 
         Command startTimer = drive.run(coroutine -> timer.restart()).named("Start timer");
 
         Command accelerateAndGatherData =
-                drive.run(
-                                coroutine -> {
+                drive.runRepeatedly(
+                                () -> {
                                     double voltage = timer.get() * DriverConstants.FF_RAMP_RATE;
                                     drive.runCharacterization(voltage);
                                     velocitySamples.add(drive.getFFCharacterizationVelocity());
                                     voltageSamples.add(voltage);
                                 })
-                        .named("Accelerate and gather data");
-
-        Command calculate =
-                drive.run(
-                                coroutine -> {
+                        .whenCanceled(
+                                () -> {
                                     int n = velocitySamples.size();
                                     double sumX = 0.0;
                                     double sumY = 0.0;
@@ -369,20 +367,16 @@ public interface DriveCommands {
                                     double kV =
                                             (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
 
-                                    NumberFormat formatter = new DecimalFormat("#0.00000");
-                                    System.out.println(
-                                            "********** Swerve FF Characterization Results **********");
-                                    System.out.println("\tkS: " + formatter.format(kS));
-                                    System.out.println("\tkV: " + formatter.format(kV));
+                                    Logger.recordOutput("Swerve/FF Char/kS", kS);
+                                    Logger.recordOutput("Swerve/FF Char/kV", kV);
                                 })
-                        .named("Calculate results");
+                        .named("Accelerate and gather data");
 
         return resetData
                 .andThen(orientModules)
                 .andThen(startTimer)
                 .andThen(accelerateAndGatherData)
-                .andThen(calculate)
-                .named("Joystick Swerve Angle");
+                .named("Swerve FF Characterization");
     }
 
     /** Measures the robot's wheel radius by spinning in a circle. */

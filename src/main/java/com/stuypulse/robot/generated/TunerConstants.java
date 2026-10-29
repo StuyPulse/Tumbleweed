@@ -42,8 +42,8 @@ public class TunerConstants {
                     .withKP(0.09958)
                     .withKI(0)
                     .withKD(0)
-                    .withKS(0.24005)
-                    .withKV(0.11563)
+                    .withKS(0.299399)
+                    .withKV(0.727035)
                     .withKA(0.0052154);
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
@@ -65,7 +65,7 @@ public class TunerConstants {
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
-    private static final Current kSlipCurrent = Amps.of(120);
+    private static final Current kSlipCurrent = Amps.of(80);
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
