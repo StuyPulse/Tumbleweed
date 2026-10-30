@@ -5,9 +5,9 @@
 package com.stuypulse.robot.opmodes.sysid;
 
 import com.stuypulse.robot.Robot;
-import com.stuypulse.robot.util.SysIdRoutine;
-import com.stuypulse.robot.util.SysIdRoutine.Direction;
 
+import org.wpilib.command3.sysid.SysIdRoutine;
+import org.wpilib.command3.sysid.SysIdRoutine.Direction;
 import org.wpilib.opmode.Utility;
 
 @Utility(name = "Dynamic Reverse", group = "SysId")
