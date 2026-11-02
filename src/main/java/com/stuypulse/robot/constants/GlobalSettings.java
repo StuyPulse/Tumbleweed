@@ -21,7 +21,9 @@ public interface GlobalSettings {
      * Uses a {@link LoggedNetworkBoolean} for each subsystem to add subsystem toggling
      * functionality from external dashboards.
      */
-    interface EnabledSubsystems {}
+    interface EnabledSubsystems {
+        LoggedNetworkBoolean VISION = new LoggedNetworkBoolean("Tunable/EnabledSubsystems/Vision");
+    }
 
     /** What mode the robot is in when running a simulation. */
     RobotMode SIMULATION_TASK = RobotMode.SIM;
