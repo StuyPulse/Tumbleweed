@@ -15,7 +15,7 @@ import org.wpilib.opmode.Utility;
 
 @Utility(
         name = "Swerve FF Characterization",
-        group = "Characterization",
+        group = "Characterize",
         description = "Swerve FeedForward characterization routine made by 6328")
 public class SwerveFFCharacterization implements OpMode {
     private final Swerve swerve;

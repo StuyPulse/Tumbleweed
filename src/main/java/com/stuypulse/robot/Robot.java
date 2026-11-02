@@ -4,8 +4,6 @@
 /**************************************************************/
 package com.stuypulse.robot;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stuypulse.robot.constants.GlobalSettings;
 
 import org.wpilib.command3.Scheduler;
@@ -15,6 +13,8 @@ import org.wpilib.framework.OpModeRobot;
 import org.wpilib.system.Filesystem;
 import org.wpilib.util.Alert;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -28,25 +28,22 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 /**
  * Robot Class
  *
- * <p>
- * This is the main class for robot code, instantiated in
- * {@link com.stuypulse.robot.Main} It
- * extends TimedRobot, meaning that the methods in this class are called
- * automatically during
+ * <p>This is the main class for robot code, instantiated in {@link com.stuypulse.robot.Main} It
+ * extends TimedRobot, meaning that the methods in this class are called automatically during
  * specific states of the robot.
  */
 public class Robot extends OpModeRobot {
-    private static final Alert allianceDisconnectedAlert = new Alert(
-            "AllianceDisconnected",
-            "alliance cannot be determined by match state, check FMS",
-            Alert.Level.MEDIUM);
+    private static final Alert allianceDisconnectedAlert =
+            new Alert(
+                    "AllianceDisconnected",
+                    "alliance cannot be determined by match state, check FMS",
+                    Alert.Level.MEDIUM);
 
     /**
      * Checks the alliance the robot is on
      *
-     * @return true if the robot is on the blue alliance, false if the robot is on
-     *         the red alliance,
-     *         and false if alliance cannot be determined.
+     * @return true if the robot is on the blue alliance, false if the robot is on the red alliance,
+     *     and false if alliance cannot be determined.
      */
     public static boolean isBlue() {
         final Optional<Alliance> alliance = MatchState.getAlliance();

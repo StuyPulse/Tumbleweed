@@ -8,11 +8,11 @@ import static org.wpilib.units.Units.Volts;
 
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveCharacterization.DriveSysId;
-import com.stuypulse.robot.util.SysIdRoutine;
-import com.stuypulse.robot.util.SysIdRoutine.Direction;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
+import org.wpilib.command3.sysid.SysIdRoutine;
+import org.wpilib.command3.sysid.SysIdRoutine.Direction;
 import org.wpilib.opmode.OpMode;
 
 import java.util.function.BiFunction;

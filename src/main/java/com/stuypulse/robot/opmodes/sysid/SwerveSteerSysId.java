@@ -10,11 +10,13 @@ import com.stuypulse.robot.Robot;
 import com.stuypulse.robot.subsystems.swerve.Swerve;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveCharacterization;
 import com.stuypulse.robot.subsystems.swerve.SwerveConstants.SwerveCharacterization.SteerSysId;
-import com.stuypulse.robot.util.SysIdRoutine;
-import com.stuypulse.robot.util.SysIdRoutine.Direction;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
+import org.wpilib.command3.sysid.SysIdRoutine;
+import org.wpilib.command3.sysid.SysIdRoutine.Config;
+import org.wpilib.command3.sysid.SysIdRoutine.Direction;
+import org.wpilib.command3.sysid.SysIdRoutine.SysIdMechanism;
 import org.wpilib.opmode.OpMode;
 import org.wpilib.opmode.Utility;
 import org.wpilib.units.measure.Time;
@@ -32,14 +34,14 @@ public class SwerveSteerSysId implements OpMode {
     public SwerveSteerSysId(Robot robot) {
         swerve = robot.getContainer().getSwerve();
 
-        SysIdRoutine.Config config =
+        Config config =
                 new SysIdRoutine.Config(
                         SteerSysId.RAMP_RATE,
                         SteerSysId.STEP_VOLTAGE,
                         SteerSysId.QUASISTATIC_TIMEOUT,
                         state -> Logger.recordOutput("SysId/SwerveSteer/State", state.toString()));
 
-        SysIdRoutine.SysIdMechanism mechanism =
+        SysIdMechanism mechanism =
                 new SysIdRoutine.SysIdMechanism(
                         volts -> swerve.runSteerCharacterization(volts.in(Volts)),
                         log ->
