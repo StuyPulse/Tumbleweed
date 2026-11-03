@@ -32,7 +32,8 @@ deploy.targets.register<SystemCore>("systemcore") {
         // Set to true to use debug including JNI, which will drastically impact performance.
         debugJni = false
         jvmArgs.add("-XX:+UseCompactObjectHeaders")
-        jvmArgs.add("--add-modules jdk.incubator.vector")
+        jvmArgs.add("--add-modules")
+        jvmArgs.add("jdk.incubator.vector")
     }
 
     artifacts.register<FileTreeArtifact>("wpilibStaticFileDeploy") {
