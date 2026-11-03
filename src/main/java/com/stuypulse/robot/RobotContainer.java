@@ -4,7 +4,7 @@
 /**************************************************************/
 package com.stuypulse.robot;
 
-import com.stuypulse.robot.commands.auton.AutonomousRoutines;
+import com.stuypulse.robot.commands.auton.AutonFactory;
 import com.stuypulse.robot.commands.subsystems.DriveCommands;
 import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
@@ -26,7 +26,7 @@ import org.wpilib.tunable.Selectable;
 public class RobotContainer {
 
     // Gamepads
-    public final CommandGamepad driver =
+    private final CommandGamepad driver =
             new CommandGamepad(GlobalPorts.Gamepad.DRIVER); // model-agnostic controller
     // public final CommandGamepad operator = new
     // CommandGamepad(GlobalPorts.Gamepad.OPERATOR);
@@ -35,7 +35,7 @@ public class RobotContainer {
 
     private final Swerve swerve;
     // Autons
-    private static Selectable<Command> autonChooser = new Selectable<>();
+    private static final Selectable<Command> autonChooser = new Selectable<>();
 
     // Robot container
 
@@ -113,7 +113,8 @@ public class RobotContainer {
     /**************/
 
     public void configureAutons() {
-        autonChooser.addDefault("Do Nothing", AutonomousRoutines.doNothingAuton());
+        AutonFactory autonFactory = new AutonFactory();
+        autonChooser.addDefault("Do Nothing", autonFactory.doNothingAuton().getCommand());
 
         // // Set up SysId routines
         // autonChooser.add(
