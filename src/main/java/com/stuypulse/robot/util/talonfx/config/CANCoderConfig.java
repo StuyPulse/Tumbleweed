@@ -2,7 +2,7 @@
 /* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
 /* This work is licensed under the terms of the MIT license.  */
 /**************************************************************/
-package com.stuypulse.robot.util.talonfx;
+package com.stuypulse.robot.util.talonfx.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -28,7 +28,7 @@ public class CANCoderConfig {
     // MAGNET SENSOR CONFIGS
 
     public CANCoderConfig withSensorDirection(SensorDirectionValue sensorDirection) {
-        magnetSensorConfigs.SensorDirection = sensorDirection;
+        magnetSensorConfigs.withSensorDirection(sensorDirection);
 
         configuration.withMagnetSensor(magnetSensorConfigs);
 
@@ -36,7 +36,7 @@ public class CANCoderConfig {
     }
 
     public CANCoderConfig withAbsoluteSensorDiscontinuityPoint(double discontinuityPoint) {
-        magnetSensorConfigs.AbsoluteSensorDiscontinuityPoint = discontinuityPoint;
+        magnetSensorConfigs.withAbsoluteSensorDiscontinuityPoint(discontinuityPoint);
 
         configuration.withMagnetSensor(magnetSensorConfigs);
 
@@ -44,7 +44,7 @@ public class CANCoderConfig {
     }
 
     public CANCoderConfig withMagnetOffset(double magnetOffset) {
-        magnetSensorConfigs.MagnetOffset = magnetOffset;
+        magnetSensorConfigs.withMagnetOffset(magnetOffset);
 
         configuration.withMagnetSensor(magnetSensorConfigs);
 

@@ -4,11 +4,12 @@
 /**************************************************************/
 package com.stuypulse.robot.commands.auton;
 
-import org.wpilib.command3.Command;
+/** Class that stores all auton commands */
+public class AutonFactory {
+    /** Add robot subsystems into this constructor for easy access when making autons */
+    public AutonFactory() {}
 
-/** Interface for all the command routines used in the autonomous period. */
-public interface AutonomousRoutines {
-    public static Command doNothingAuton() {
-        return Command.sequence().named("Do Nothing");
+    public Auton doNothingAuton() {
+        return new Auton() {};
     }
 }

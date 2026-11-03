@@ -4,7 +4,7 @@
 /**************************************************************/
 package com.stuypulse.robot.util.talonfx.sim;
 
-import com.stuypulse.robot.util.talonfx.TalonFXConfig;
+import com.stuypulse.robot.util.talonfx.config.TalonFXConfig;
 
 import org.wpilib.system.RobotController;
 import org.wpilib.units.measure.*;
