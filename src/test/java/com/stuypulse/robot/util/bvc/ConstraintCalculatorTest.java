@@ -10,14 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.wpilib.math.geometry.Translation2d;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(TimingExtension.class)
 public class ConstraintCalculatorTest {
     private static final Translation2d current = new Translation2d(1.0, 1.0);
     private static final Translation2d neighbor = new Translation2d(2.0, 2.0);
     private static final Translation2d testPoint = new Translation2d(1.5, 1.5);
 
     @Test
-    public void constraintTest() {
+    public void constraintEqualityTest() {
         assertDoesNotThrow(
                 () -> {
                     var constraintRegular = ConstraintCalculator.getConstraint(current, neighbor);
@@ -26,5 +28,21 @@ public class ConstraintCalculatorTest {
                     double resultSIMD = constraintSIMD.applyAsDouble(testPoint.toVector());
                     assertEquals(resultRegular, resultSIMD);
                 });
+    }
+
+    @Test
+    public void constraintRegularTimingTest() {
+        for (int i = 0; i < 100; i++) {
+            var constraint = ConstraintCalculator.getConstraint(current, neighbor);
+            constraint.applyAsDouble(testPoint.toVector());
+        }
+    }
+
+    @Test
+    public void constraintSIMDTimingTest() {
+        for (int i = 0; i < 100; i++) {
+            var constraint = ConstraintCalculator.getConstraintSIMD(current, neighbor);
+            constraint.applyAsDouble(testPoint.toVector());
+        }
     }
 }

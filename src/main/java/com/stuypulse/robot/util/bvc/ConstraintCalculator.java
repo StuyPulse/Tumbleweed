@@ -19,9 +19,7 @@ public final class ConstraintCalculator {
 
     private ConstraintCalculator() {}
 
-    public static double norm(double x, double y) {
-        return 0.0;
-    }
+    private static final double SAFETY_RADIUS = 1.0; // idk what unit
 
     @NoDiscard
     public static DoubleVector vectorToVector(Vector<N2> vector) {
@@ -49,8 +47,6 @@ public final class ConstraintCalculator {
                 vectorToVector(p).sub(midpoint).mul(displacement).reduceLanes(VectorOperators.ADD)
                         + buffer;
     }
-
-    private static final double SAFETY_RADIUS = 1.0; // idk what unit
 
     /**
      * gets a constraint for an invalid case of the bvc (vision integration coming soon)
