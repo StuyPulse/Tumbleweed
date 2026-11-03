@@ -4,22 +4,16 @@
 /**************************************************************/
 package com.stuypulse.robot.util.bvc;
 
-import com.stuypulse.robot.subsystems.swerve.Swerve;
-
 import org.wpilib.annotation.NoDiscard;
-import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N2;
 
-import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
-
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorOperators;
-import jdk.incubator.vector.VectorSpecies;
 
 public final class ConstraintCalculator {
 
@@ -36,17 +30,24 @@ public final class ConstraintCalculator {
 
     /**
      * polyline function for quadratic optimization
+     *
      * @param currentPose
      * @param neighborPose
      * @return scalar supplier that is ≤ 0 when input is fine
      */
-    public static ToDoubleFunction<Vector<N2>> getConstraintSIMD(Pose2d currentPose, Pose2d neighborPose) {
-        DoubleVector self = vectorToVector(currentPose.getTranslation().toVector());
-        DoubleVector neighbor = vectorToVector(neighborPose.getTranslation().toVector());
+    public static ToDoubleFunction<Vector<N2>> getConstraintSIMD(
+            Translation2d currentPose, Translation2d neighborPose) {
+        DoubleVector self = vectorToVector(currentPose.toVector());
+        DoubleVector neighbor = vectorToVector(neighborPose.toVector());
         DoubleVector displacement = neighbor.sub(self);
         DoubleVector midpoint = self.add(neighbor).div(2);
-        double buffer = SAFETY_RADIUS * Math.sqrt(displacement.mul(displacement).reduceLanes(VectorOperators.ADD));
-        return p -> vectorToVector(p).sub(midpoint).mul(displacement).reduceLanes(VectorOperators.ADD) + buffer;
+        double buffer =
+                SAFETY_RADIUS
+                        * Math.sqrt(
+                                displacement.mul(displacement).reduceLanes(VectorOperators.ADD));
+        return p ->
+                vectorToVector(p).sub(midpoint).mul(displacement).reduceLanes(VectorOperators.ADD)
+                        + buffer;
     }
 
     private static final double SAFETY_RADIUS = 1.0; // idk what unit
@@ -57,14 +58,10 @@ public final class ConstraintCalculator {
      * @param swerve swerve subsystem
      */
     public static ToDoubleFunction<Vector<N2>> getConstraint(
-            Swerve swerve, Pose2d neighborPose) { // TODO: vector api
-        Vector<N2> self =
-                swerve.getPose()
-                        .getTranslation()
-                        .toVector(); // vector is just a 2x1 matrix (rows x columns)
+            Translation2d currentPose, Translation2d neighborPose) { // TODO: vector api
+        Vector<N2> self = currentPose.toVector(); // vector is just a 2x1 matrix (rows x columns)
         Vector<N2> neighbor =
                 neighborPose
-                        .getTranslation()
                         .toVector(); // placeholder, should be sourced from vision in the future,
         // maybe pose supplier?
         Vector<N2> displacement = neighbor.minus(self);

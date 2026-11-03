@@ -89,6 +89,10 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    jvmArgs(
+        "-XX:+UseCompactObjectHeaders",
+        "--add-modules", "jdk.incubator.vector",
+    )
 }
 
 tasks.jar {
@@ -105,6 +109,7 @@ tasks.jar {
 
 tasks.withType<JavaCompile> {
     options.compilerArgs.add("-XDstringConcat=inline") // Configure string concat to always inline compile
+    options.compilerArgs.addAll(listOf("--add-modules", "jdk.incubator.vector")) // expose vector api
 }
 
 fun isFullyCommented(f: File): Boolean {
