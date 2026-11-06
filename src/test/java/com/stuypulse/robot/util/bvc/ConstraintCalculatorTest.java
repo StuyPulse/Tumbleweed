@@ -7,8 +7,11 @@ package com.stuypulse.robot.util.bvc;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.wpilib.math.autodiff.VariableMatrix;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.optimization.Problem;
 
+import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -44,5 +47,21 @@ public class ConstraintCalculatorTest {
             var constraint = ConstraintCalculator.getConstraintSIMD(current, neighbor);
             constraint.applyAsDouble(testPoint.toVector());
         }
+    }
+
+    @Test
+    public void constraintSleipnirTest() {
+        SimpleMatrix goalPoint = new SimpleMatrix(new double[] {3, 3});
+        Problem problem = new Problem();
+        VariableMatrix targetVariable = problem.decisionVariable(2, 1);
+        var constraintSleipnir =
+                ConstraintCalculator.getConstraintSleipnir(targetVariable, current, neighbor);
+        problem.subjectTo(constraintSleipnir);
+        VariableMatrix costMatrix = targetVariable.unaryMinus().plus(goalPoint); // goal - target
+        VariableMatrix cost = costMatrix.T().times(costMatrix);
+        problem.minimize(cost);
+        problem.solve();
+        IO.println(targetVariable.value());
+        problem.close();
     }
 }
