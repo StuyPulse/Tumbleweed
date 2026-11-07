@@ -5,6 +5,7 @@
 package com.stuypulse.robot.util.bvc;
 
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.math.autodiff.Variable;
 import org.wpilib.math.autodiff.VariableMatrix;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.linalg.Matrix;
@@ -17,7 +18,6 @@ import org.wpilib.math.optimization.InequalityConstraints;
 import java.util.function.ToDoubleFunction;
 import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.VectorOperators;
-import org.ejml.simple.SimpleMatrix;
 
 public final class ConstraintCalculator {
     private ConstraintCalculator() {}
@@ -83,23 +83,33 @@ public final class ConstraintCalculator {
                         + buffer; // worst math oat
     }
 
+    /**
+     * Gets a constraint for a given neighbor
+     *
+     * <p>backed by sleipnir for solving purposes
+     *
+     * @param target pose of the target location
+     * @param currentPose pose of the ego-robot (self)
+     * @param neighborPose pose of the neighboring robot
+     * @return solveable sleipnir constraint
+     */
     public static InequalityConstraints getConstraintSleipnir(
             VariableMatrix target, Translation2d currentPose, Translation2d neighborPose) {
-        SimpleMatrix self =
-                new SimpleMatrix(
-                        new double[] {
-                            currentPose.getX(), currentPose.getY()
-                        }); // vector is just a 2x1 matrix (rows x columns)
-        SimpleMatrix neighbor =
-                new SimpleMatrix(new double[] {neighborPose.getX(), neighborPose.getY()});
-        SimpleMatrix displacement = neighbor.minus(self);
-        SimpleMatrix midpoint = self.plus(neighbor).transpose().divide(2);
-        double buffer =
-                SAFETY_RADIUS_METRES
-                        * displacement
-                                .normF(); // normf works because frobenius norm flattens matrices
-        // into vect, but its already vect
-        return Constraints.le(
-                target.T().minus(midpoint).times(displacement).get(0).plus(buffer), 0);
+        double selfX = currentPose.getX();
+        double selfY = currentPose.getY();
+        double neighborX = neighborPose.getX();
+        double neighborY = neighborPose.getY();
+
+        double dispX = neighborX - selfX;
+        double dispY = neighborY - selfY;
+
+        double midX = (selfX + neighborX) / 2.0;
+        double midY = (selfY + neighborY) / 2.0;
+
+        double buffer = SAFETY_RADIUS_METRES * Math.sqrt((dispX * dispX) + (dispY * dispY));
+        Variable dotX = target.get(0, 0).minus(midX).times(dispX); // dot product
+        Variable dotY = target.get(1, 0).minus(midY).times(dispY);
+        Variable lhs = dotX.plus(dotY).plus(buffer);
+        return Constraints.le(lhs, 0);
     }
 }

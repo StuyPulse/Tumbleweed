@@ -7,11 +7,12 @@ package com.stuypulse.robot.util.bvc;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.wpilib.math.autodiff.Variable;
 import org.wpilib.math.autodiff.VariableMatrix;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.optimization.InequalityConstraints;
 import org.wpilib.math.optimization.Problem;
 
-import org.ejml.simple.SimpleMatrix;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -51,17 +52,30 @@ public class ConstraintCalculatorTest {
 
     @Test
     public void constraintSleipnirTest() {
-        SimpleMatrix goalPoint = new SimpleMatrix(new double[] {3, 3});
         Problem problem = new Problem();
         VariableMatrix targetVariable = problem.decisionVariable(2, 1);
-        var constraintSleipnir =
+
+        InequalityConstraints constraintSleipnir =
                 ConstraintCalculator.getConstraintSleipnir(targetVariable, current, neighbor);
         problem.subjectTo(constraintSleipnir);
-        VariableMatrix costMatrix = targetVariable.unaryMinus().plus(goalPoint); // goal - target
-        VariableMatrix cost = costMatrix.T().times(costMatrix);
+
+        double targetX = 3.0;
+        double targetY = 3.0;
+        Variable dx = targetVariable.get(0, 0).minus(targetX);
+        Variable dy = targetVariable.get(1, 0).minus(targetY);
+        Variable cost = dx.times(dx).plus(dy.times(dy));
+
         problem.minimize(cost);
         problem.solve();
-        IO.println(targetVariable.value());
+
+        IO.println(
+                "X: "
+                        + targetVariable.get(0, 0).value()
+                        + ", Y: "
+                        + targetVariable.get(1, 0).value());
+
         problem.close();
+        assertEquals(0.7928932185295877, targetVariable.get(0, 0).value());
+        assertEquals(0.792893218529588, targetVariable.get(1, 0).value());
     }
 }
