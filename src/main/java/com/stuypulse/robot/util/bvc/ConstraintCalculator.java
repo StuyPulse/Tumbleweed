@@ -22,8 +22,9 @@ import jdk.incubator.vector.VectorOperators;
 public final class ConstraintCalculator {
     private ConstraintCalculator() {}
 
-    private static final double SAFETY_RADIUS_METRES =
-            1.0; // could use units system from wpilib but no conversions are needed anywhere
+    private static final double SAFETY_RADIUS_METRES = 0.3;
+
+    // could use units system from wpilib but no conversions are needed anywhere
 
     /**
      * Converts a WPILib vector to a JEP 529 vector

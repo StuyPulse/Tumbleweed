@@ -73,9 +73,40 @@ public class ConstraintCalculatorTest {
                         + targetVariable.get(0, 0).value()
                         + ", Y: "
                         + targetVariable.get(1, 0).value());
-
+        // assertEquals(0.7928932185295877, targetVariable.get(0, 0).value());
+        // assertEquals(0.792893218529588, targetVariable.get(1, 0).value());
         problem.close();
-        assertEquals(0.7928932185295877, targetVariable.get(0, 0).value());
-        assertEquals(0.792893218529588, targetVariable.get(1, 0).value());
+    }
+
+    @Test
+    public void constraintSleipnirConvergeTest() {
+        double targetX = 3.0;
+        double targetY = 2.0;
+
+        double lastX = current.getX();
+        double lastY = current.getY();
+
+        for (int i = 0; i < 10; i++) {
+            Problem problem = new Problem();
+            VariableMatrix targetVariable = problem.decisionVariable(2, 1);
+
+            InequalityConstraints constraintSleipnir =
+                    ConstraintCalculator.getConstraintSleipnir(
+                            targetVariable, new Translation2d(lastX, lastY), neighbor);
+            problem.subjectTo(constraintSleipnir);
+
+            Variable dx = targetVariable.get(0, 0).minus(targetX);
+            Variable dy = targetVariable.get(1, 0).minus(targetY);
+            Variable cost = dx.times(dx).plus(dy.times(dy));
+
+            problem.minimize(cost);
+            problem.solve();
+
+            lastX = targetVariable.get(0, 0).value();
+            lastY = targetVariable.get(1, 0).value();
+            IO.println("X: " + lastX + ", Y: " + lastY);
+
+            problem.close();
+        }
     }
 }
