@@ -92,6 +92,16 @@ tasks.test {
     jvmArgs(
         "-XX:+UseCompactObjectHeaders",
         "--add-modules", "jdk.incubator.vector",
+        "-XX:+UseZGC",
+        "-XX:StartFlightRecording=" +
+        listOf(
+            "filename=${layout.buildDirectory.get().asFile}/reports/rec.jfr",
+            "settings=profile",
+            "method-trace=com.stuypulse.robot.util.bvc.ConstraintCalculator",
+            "method-timing=com.stuypulse.robot.util.bvc.ConstraintCalculator",
+            "jdk.ExecutionSample#period=1ms",
+            "jdk.NativeMethodSample#period=1ms",
+        ).joinToString(",")
     )
 }
 

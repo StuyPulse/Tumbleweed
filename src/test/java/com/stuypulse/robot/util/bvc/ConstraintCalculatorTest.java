@@ -51,34 +51,6 @@ public class ConstraintCalculatorTest {
     }
 
     @Test
-    public void constraintSleipnirTest() {
-        Problem problem = new Problem();
-        VariableMatrix targetVariable = problem.decisionVariable(2, 1);
-
-        InequalityConstraints constraintSleipnir =
-                ConstraintCalculator.getConstraintSleipnir(targetVariable, current, neighbor);
-        problem.subjectTo(constraintSleipnir);
-
-        double targetX = 3.0;
-        double targetY = 3.0;
-        Variable dx = targetVariable.get(0, 0).minus(targetX);
-        Variable dy = targetVariable.get(1, 0).minus(targetY);
-        Variable cost = dx.times(dx).plus(dy.times(dy));
-
-        problem.minimize(cost);
-        problem.solve();
-
-        IO.println(
-                "X: "
-                        + targetVariable.get(0, 0).value()
-                        + ", Y: "
-                        + targetVariable.get(1, 0).value());
-        // assertEquals(0.7928932185295877, targetVariable.get(0, 0).value());
-        // assertEquals(0.792893218529588, targetVariable.get(1, 0).value());
-        problem.close();
-    }
-
-    @Test
     public void constraintSleipnirConvergeTest() {
         double targetX = 3.0;
         double targetY = 2.0;
@@ -108,5 +80,31 @@ public class ConstraintCalculatorTest {
 
             problem.close();
         }
+    }
+
+    @Test
+    public void constraintSleipnirTest() {
+        Problem problem = new Problem();
+        VariableMatrix targetVariable = problem.decisionVariable(2, 1);
+
+        InequalityConstraints constraintSleipnir =
+                ConstraintCalculator.getConstraintSleipnir(targetVariable, current, neighbor);
+        problem.subjectTo(constraintSleipnir);
+
+        double targetX = 3.0;
+        double targetY = 3.0;
+        Variable dx = targetVariable.get(0, 0).minus(targetX);
+        Variable dy = targetVariable.get(1, 0).minus(targetY);
+        Variable cost = dx.times(dx).plus(dy.times(dy));
+
+        problem.minimize(cost);
+        problem.solve();
+
+        IO.println(
+                "X: "
+                        + targetVariable.get(0, 0).value()
+                        + ", Y: "
+                        + targetVariable.get(1, 0).value());
+        problem.close();
     }
 }

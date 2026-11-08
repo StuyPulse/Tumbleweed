@@ -4,29 +4,40 @@
 /**************************************************************/
 package com.stuypulse.robot.util.bvc;
 
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.Label;
+import jdk.jfr.Name;
+import jdk.jfr.StackTrace;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class TimingExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
-    private static final String START_TIME = "start_time";
+    @Name("junit.TestMethod")
+    @Label("Test Method")
+    @Category("Tests")
+    @StackTrace(true)
+    static class TestMethodEvent extends Event {
+        @Label("Class")
+        public String className;
 
-    @Override
-    public void beforeTestExecution(ExtensionContext context) {
-        getStore(context).put(START_TIME, System.nanoTime());
+        @Label("Method")
+        public String methodName;
     }
 
     @Override
-    public void afterTestExecution(ExtensionContext context) {
-        long startTime = getStore(context).remove(START_TIME, long.class);
-        long duration = System.nanoTime() - startTime;
+    public void beforeTestExecution(ExtensionContext ctx) {
+        TestMethodEvent e = new TestMethodEvent();
+        e.className = ctx.getRequiredTestClass().getName();
+        e.methodName = ctx.getRequiredTestMethod().getName();
+        e.begin();
+        getStore(ctx).put("jfr_event", e);
+    }
 
-        System.out.println(
-                "Method "
-                        + context.getRequiredTestMethod().getName()
-                        + " took "
-                        + (duration / 1e6)
-                        + " ms");
+    @Override
+    public void afterTestExecution(ExtensionContext ctx) {
+        getStore(ctx).remove("jfr_event", TestMethodEvent.class).commit();
     }
 
     private ExtensionContext.Store getStore(ExtensionContext context) {
