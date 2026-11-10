@@ -4,9 +4,13 @@
 /**************************************************************/
 package com.stuypulse.robot.util.bvc;
 
+import com.stuypulse.robot.constants.FieldConstants;
+
 import org.wpilib.annotation.NoDiscard;
 import org.wpilib.math.autodiff.Variable;
 import org.wpilib.math.autodiff.VariableMatrix;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.Vector;
@@ -21,6 +25,13 @@ import jdk.incubator.vector.VectorOperators;
 
 public final class ConstraintCalculator {
     private ConstraintCalculator() {}
+
+    private static final Pose2d targetPlaceholder = new Pose2d(2, 2, Rotation2d.ZERO);
+
+    public static Pose2d getTarget() {
+        FieldConstants.FIELD_2D.getObject("BVCTarget").setPose(targetPlaceholder);
+        return targetPlaceholder; // placeholder!!
+    }
 
     private static final double SAFETY_RADIUS_METRES = 0.3;
 

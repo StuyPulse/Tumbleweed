@@ -60,4 +60,12 @@ public interface SwerveConstants {
         MountOrientation SYSCORE_MOUNT_ORIENTATION = MountOrientation.FLAT;
         GyroType GYRO_TYPE = GyroType.PIGEON_2;
     }
+
+    interface SwerveGains {
+        interface Translation {
+            double kP = 20.0;
+            double kI = 0.0;
+            double kD = 0.2;
+        }
+    }
 }

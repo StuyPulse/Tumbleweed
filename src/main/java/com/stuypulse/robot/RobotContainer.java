@@ -5,6 +5,7 @@
 package com.stuypulse.robot;
 
 import com.stuypulse.robot.commands.auton.AutonFactory;
+import com.stuypulse.robot.commands.subsystems.BVCCommands;
 import com.stuypulse.robot.commands.subsystems.DriveCommands;
 import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
@@ -104,6 +105,8 @@ public class RobotContainer {
                 .onTrue(
                         Command.noRequirements(coroutine -> swerve.resetHeading(Rotation2d.ZERO))
                                 .named("Swerve Reset Heading"));
+        driver.faceDown().whileTrue(BVCCommands.PIDToPose(swerve, "BVCPose"));
+        driver.faceRight().whileTrue(BVCCommands.PIDToRyan(swerve, "RyanPose"));
 
         driver.faceLeft().onTrue(DriveCommands.xMode(swerve));
     }

@@ -6,6 +6,7 @@ package com.stuypulse.robot.subsystems.swerve;
 
 import static org.wpilib.units.Units.*;
 
+import com.stuypulse.robot.constants.FieldConstants;
 import com.stuypulse.robot.constants.GlobalSettings;
 import com.stuypulse.robot.constants.GlobalSettings.RobotMode;
 import com.stuypulse.robot.generated.TunerConstants;
@@ -27,6 +28,7 @@ import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.util.Alert;
 
 import java.util.Optional;
@@ -199,6 +201,8 @@ public class Swerve extends PeriodicSubsystem implements SimulatedMechanism {
                 !gyroInputs.connected && GlobalSettings.CURRENT_MODE != RobotMode.SIM);
 
         Logger.recordOutput("Swerve/Pose", getPose());
+        FieldConstants.FIELD_2D.getRobotObject().setPose(getPose());
+        Telemetry.log("RealOutputs/Field", FieldConstants.FIELD_2D);
     }
 
     /**
