@@ -12,7 +12,7 @@ import org.wpilib.units.measure.*;
 
 public interface SwerveConstants {
     public interface SwerveConstraints {
-        LinearVelocity MAX_VELOCITY = MetersPerSecond.of(4.16);
+        LinearVelocity MAX_VELOCITY = MetersPerSecond.of(3.76);
         LinearVelocity MAX_VELOCITY_SOTM = MetersPerSecond.of(1.75);
         LinearVelocity MAX_VELOCITY_FOTM = MetersPerSecond.of(4.16);
 
