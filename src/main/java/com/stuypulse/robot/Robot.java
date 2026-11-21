@@ -79,8 +79,7 @@ public class Robot extends LoggedOpModeRobot {
         return false;
     }
 
-    private final CommandGamepad driver = 
-            new CommandGamepad(GlobalPorts.Gamepad.DRIVER);
+    private final CommandGamepad driver = new CommandGamepad(GlobalPorts.Gamepad.DRIVER);
     public final Scheduler defaultScheduler;
     public final Vision vision;
     public final Swerve swerve;
@@ -104,10 +103,10 @@ public class Robot extends LoggedOpModeRobot {
                 for (Camera camera : VisionConstants.Camera.values()) {
                     visionIOMap.put(
                             camera,
-                                    new VisionIOLimelight(
-                                            camera.getName(),
-                                            camera.getRobotToCamera(),
-                                            swerve::getRotation));
+                            new VisionIOLimelight(
+                                    camera.getName(),
+                                    camera.getRobotToCamera(),
+                                    swerve::getRotation));
                 }
             }
 
@@ -121,8 +120,7 @@ public class Robot extends LoggedOpModeRobot {
                                 new ModuleIOSim(TunerConstants.BackRight),
                                 new GyroIO() {});
                 for (Camera camera : Camera.values()) {
-                    visionIOMap.put(
-                            camera, new VisionIO() {});
+                    visionIOMap.put(camera, new VisionIO() {});
                 }
             }
 
@@ -152,7 +150,6 @@ public class Robot extends LoggedOpModeRobot {
     /*******************/
     /*** ROBOT SETUP ***/
     /*******************/
-
 
     private void configureLogging() {
         // Git metadata
