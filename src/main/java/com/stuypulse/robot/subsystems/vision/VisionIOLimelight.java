@@ -201,6 +201,6 @@ public class VisionIOLimelight implements VisionIO {
 
         aprilTagWhitelistPublisher.accept(
                 Arrays.stream(outputs.aprilTagWhitelist).asDoubleStream().toArray());
-        imuModePublisher.accept(outputs.imuMode);
+        imuModePublisher.accept(outputs.imuMode.ordinal());
     }
 }
