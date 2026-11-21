@@ -4,8 +4,6 @@
 /**************************************************************/
 package com.stuypulse.robot.commands.auton;
 
-import com.stuypulse.robot.RobotContainer;
-
 import org.wpilib.command3.Command;
 
 /**

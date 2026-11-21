@@ -1,4 +1,4 @@
-/********************* PROJECT TUMBLEWEED *********************/
+/************************ PROJECT ZIXI ************************/
 /* Copyright (c) 2026 StuyPulse Robotics. All rights reserved.*/
 /* This work is licensed under the terms of the MIT license.  */
 /**************************************************************/
@@ -24,7 +24,7 @@ import org.wpilib.units.measure.Time;
 import org.littletonrobotics.junction.Logger;
 
 @Utility(
-        name = "SysId: Swerve Steer",
+        name = "Swerve Steer",
         group = "SysId",
         description = "Runs only the steer motors. Put the robot on blocks.")
 public class SwerveSteerSysId implements OpMode {
@@ -32,7 +32,7 @@ public class SwerveSteerSysId implements OpMode {
     private final Command routine;
 
     public SwerveSteerSysId(Robot robot) {
-        swerve = robot.getContainer().getSwerve();
+        swerve = robot.swerve;
 
         Config config =
                 new SysIdRoutine.Config(

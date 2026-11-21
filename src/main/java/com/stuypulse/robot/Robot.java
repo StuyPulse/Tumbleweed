@@ -4,22 +4,45 @@
 /**************************************************************/
 package com.stuypulse.robot;
 
+import com.stuypulse.robot.commands.auton.AutonFactory;
+import com.stuypulse.robot.commands.subsystems.BVCCommands;
+import com.stuypulse.robot.commands.subsystems.DriveCommands;
+import com.stuypulse.robot.constants.FieldConstants;
+import com.stuypulse.robot.constants.GlobalPorts;
 import com.stuypulse.robot.constants.GlobalSettings;
+import com.stuypulse.robot.generated.BuildConstants;
+import com.stuypulse.robot.generated.TunerConstants;
+import com.stuypulse.robot.opmodes.AutonOpMode;
+import com.stuypulse.robot.opmodes.sysid.SwerveDriveSysId;
+import com.stuypulse.robot.subsystems.swerve.GyroIO;
+import com.stuypulse.robot.subsystems.swerve.GyroIOOnboard;
+import com.stuypulse.robot.subsystems.swerve.GyroIOPigeon2;
+import com.stuypulse.robot.subsystems.swerve.ModuleIO;
+import com.stuypulse.robot.subsystems.swerve.ModuleIOSim;
+import com.stuypulse.robot.subsystems.swerve.ModuleIOTalonFX;
+import com.stuypulse.robot.subsystems.swerve.Swerve;
+import com.stuypulse.robot.subsystems.vision.Vision;
+import com.stuypulse.robot.subsystems.vision.VisionConstants;
+import com.stuypulse.robot.subsystems.vision.VisionConstants.Camera;
+import com.stuypulse.robot.subsystems.vision.VisionIO;
+import com.stuypulse.robot.subsystems.vision.VisionIOLimelight;
 
+import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
+import org.wpilib.command3.button.CommandGamepad;
+import org.wpilib.command3.sysid.SysIdRoutine;
+import org.wpilib.command3.sysid.SysIdRoutine.Direction;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
-import org.wpilib.framework.OpModeRobot;
-import org.wpilib.system.Filesystem;
+import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.tunable.Tunables;
 import org.wpilib.util.Alert;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.EnumMap;
 import java.util.Optional;
-import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedOpModeRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
@@ -32,11 +55,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * extends TimedRobot, meaning that the methods in this class are called automatically during
  * specific states of the robot.
  */
-public class Robot extends OpModeRobot {
-    private static final Alert allianceDisconnectedAlert =
+public class Robot extends LoggedOpModeRobot {
+    private static final Alert allianceMissing =
             new Alert(
-                    "AllianceDisconnected",
-                    "alliance cannot be determined by match state, check FMS",
+                    "MissingAllianceWarning",
+                    "Alliance optional has no value present",
                     Alert.Level.MEDIUM);
 
     /**
@@ -48,35 +71,132 @@ public class Robot extends OpModeRobot {
     public static boolean isBlue() {
         final Optional<Alliance> alliance = MatchState.getAlliance();
         if (alliance.isPresent()) {
-            allianceDisconnectedAlert.set(false);
+            allianceMissing.set(false);
             return alliance.get() == Alliance.BLUE;
         } else {
-            allianceDisconnectedAlert.set(true);
-            return false;
+            allianceMissing.set(true);
         }
+        return false;
     }
 
-    private final RobotContainer robot;
-    private final Scheduler defaultScheduler;
+    private final CommandGamepad driver = 
+            new CommandGamepad(GlobalPorts.Gamepad.DRIVER);
+    public final Scheduler defaultScheduler;
+    public final Vision vision;
+    public final Swerve swerve;
 
     public Robot() {
-        robot = new RobotContainer();
         defaultScheduler = Scheduler.getDefault();
 
-        Logger.AdvancedHooks.disableRobotBaseCheck();
+        configureLogging();
 
+        EnumMap<Camera, VisionIO> visionIOMap = new EnumMap<>(Camera.class);
         switch (GlobalSettings.CURRENT_MODE) {
             case REAL -> {
-                Logger.addDataReceiver(new WPILOGWriter("/home/systemcore/logs"));
-                Logger.addDataReceiver(new NT4Publisher());
+                swerve =
+                        new Swerve(
+                                new GyroIOPigeon2(),
+                                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                                new ModuleIOTalonFX(TunerConstants.BackRight),
+                                new GyroIOOnboard());
+                for (Camera camera : VisionConstants.Camera.values()) {
+                    visionIOMap.put(
+                            camera,
+                                    new VisionIOLimelight(
+                                            camera.getName(),
+                                            camera.getRobotToCamera(),
+                                            swerve::getRotation));
+                }
             }
 
             case SIM -> {
+                swerve =
+                        new Swerve(
+                                new GyroIO() {},
+                                new ModuleIOSim(TunerConstants.FrontLeft),
+                                new ModuleIOSim(TunerConstants.FrontRight),
+                                new ModuleIOSim(TunerConstants.BackLeft),
+                                new ModuleIOSim(TunerConstants.BackRight),
+                                new GyroIO() {});
+                for (Camera camera : Camera.values()) {
+                    visionIOMap.put(
+                            camera, new VisionIO() {});
+                }
+            }
+
+            default -> {
+                swerve =
+                        new Swerve(
+                                new GyroIO() {},
+                                new ModuleIO() {},
+                                new ModuleIO() {},
+                                new ModuleIO() {},
+                                new ModuleIO() {},
+                                new GyroIO() {});
+                for (Camera camera : Camera.values()) {
+                    visionIOMap.put(camera, new VisionIO() {});
+                }
+            }
+        }
+        vision = new Vision(swerve.visionConsumer, visionIOMap, swerve::getRotation);
+
+        configureDefaultCommands();
+        configureButtonBindings();
+        configureAutons();
+        configureSysIds();
+        publishOpModes();
+    }
+
+    /*******************/
+    /*** ROBOT SETUP ***/
+    /*******************/
+
+
+    private void configureLogging() {
+        // Git metadata
+        Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        Logger.recordMetadata("GitCommitMessage", BuildConstants.GIT_MESSAGE);
+        if (!BuildConstants.GIT_LINK.isBlank()) {
+            Logger.recordMetadata("GitCommitLink", BuildConstants.GIT_LINK);
+        }
+        Logger.recordMetadata(
+                "GitPushStatus",
+                switch (BuildConstants.GIT_PUSH_STATUS) {
+                    case "PUSHED" -> "Commit pushed to remote repository";
+                    case "NOT_PUSHED" -> "Local commit not pushed to remote repository";
+                    case "STALE" -> "Could not verify push status. Cached information may be stale";
+                    default -> "Unable to determine commit push status";
+                });
+        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+        Logger.recordMetadata(
+                "GitDirty",
+                switch (BuildConstants.DIRTY) {
+                    case 0 -> "All changes committed";
+                    case 1 -> "Uncommitted changes";
+                    default -> "Unknown";
+                });
+
+        // Log setup
+        switch (GlobalSettings.CURRENT_MODE) {
+            case REAL -> {
+                // Running on a real robot, log to a USB stick ("/U/logs")
                 Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());
             }
 
+            case SIM -> {
+                // Running a physics simulator, log to NT
+                Logger.addDataReceiver(new NT4Publisher());
+            }
+
             case REPLAY -> {
+                // Replaying a log, set up replay source
+                setUseTiming(false); // Run as fast as possible
                 String logPath = LogFileUtil.findReplayLog();
                 Logger.setReplaySource(new WPILOGReader(logPath));
                 Logger.addDataReceiver(
@@ -84,44 +204,61 @@ public class Robot extends OpModeRobot {
             }
         }
 
-        logCommitHash();
         Logger.start();
-
-        AutoLogOutputManager.addObject(this);
+        Tunables.publish("Field", FieldConstants.FIELD_2D);
     }
 
-    private void logCommitHash() {
-        Path commitFile = Filesystem.getDeployDirectory().toPath().resolve("commit.json");
-
-        try {
-            if (Files.exists(commitFile)) {
-                ObjectMapper json = new ObjectMapper();
-                JsonNode object = json.readTree(commitFile.toFile());
-
-                String hash = object.path("hash").asText("unknown");
-                String message = object.path("message").asText("unknown");
-                String description = object.path("description").asText("");
-
-                Logger.recordMetadata("Commit Hash", hash);
-                Logger.recordMetadata("Commit Message", message);
-                if (!description.isBlank()) {
-                    Logger.recordMetadata("Commit Description", description);
-                }
-            } else {
-                Logger.recordMetadata("Commit", "commit.json file missing");
-            }
-        } catch (Exception e) {
-            Logger.recordMetadata("Commit", "JSON parse failed: " + e);
-        }
+    private void configureDefaultCommands() {
+        swerve.setDefaultCommand(
+                DriveCommands.joystickDrive(
+                        swerve, driver::getLeftY, driver::getLeftX, () -> -driver.getRightX()));
     }
 
-    public RobotContainer getContainer() {
-        return robot;
+    private void configureButtonBindings() {
+        driver.dpadLeft()
+                .onTrue(
+                        Command.noRequirements(coroutine -> swerve.resetHeading(Rotation2d.ZERO))
+                                .named("Swerve Reset Heading"));
+        driver.faceDown().whileTrue(BVCCommands.PIDToPose(swerve, "BVCPose"));
+        driver.faceRight().whileTrue(BVCCommands.PIDToRyan(swerve, "RyanPose"));
+
+        driver.faceLeft().onTrue(DriveCommands.xMode(swerve));
     }
 
-    /*************************/
-    /*** ROBOT SCHEDULEING ***/
-    /*************************/
+    private void configureAutons() {
+        AutonFactory autonFactory = new AutonFactory(swerve, vision);
+
+        AutonOpMode.addDefaultAuton("Do Nothing", autonFactory.doNothingAuton());
+
+        addOpMode(RobotMode.AUTONOMOUS, "Chooser Auton", () -> new AutonOpMode(this));
+    }
+
+    private void configureSysIds() {
+        addOpMode(
+                RobotMode.UTILITY,
+                "Quasistatic Reverse",
+                "SysId",
+                () -> new SwerveDriveSysId(swerve, Direction.REVERSE, SysIdRoutine::quasistatic));
+        addOpMode(
+                RobotMode.UTILITY,
+                "Quasistatic Forward",
+                "SysId",
+                () -> new SwerveDriveSysId(swerve, Direction.FORWARD, SysIdRoutine::quasistatic));
+        addOpMode(
+                RobotMode.UTILITY,
+                "Dynamic Forward",
+                "SysId",
+                () -> new SwerveDriveSysId(swerve, Direction.FORWARD, SysIdRoutine::dynamic));
+        addOpMode(
+                RobotMode.UTILITY,
+                "Dynamic Reverse",
+                "SysId",
+                () -> new SwerveDriveSysId(swerve, Direction.REVERSE, SysIdRoutine::dynamic));
+    }
+
+    /************************/
+    /*** ROBOT SCHEDULING ***/
+    /************************/
 
     @Override
     public void robotPeriodic() {
