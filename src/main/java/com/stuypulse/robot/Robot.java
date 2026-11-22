@@ -25,7 +25,7 @@ import com.stuypulse.robot.subsystems.vision.Vision;
 import com.stuypulse.robot.subsystems.vision.VisionConstants;
 import com.stuypulse.robot.subsystems.vision.VisionConstants.Camera;
 import com.stuypulse.robot.subsystems.vision.VisionIO;
-import com.stuypulse.robot.subsystems.vision.VisionIOLimelight;
+import com.stuypulse.robot.subsystems.vision.VisionIOLimelightLib;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
@@ -103,10 +103,9 @@ public class Robot extends LoggedOpModeRobot {
                 for (Camera camera : VisionConstants.Camera.values()) {
                     visionIOMap.put(
                             camera,
-                            new VisionIOLimelight(
+                            new VisionIOLimelightLib(
                                     camera.getName(),
-                                    camera.getRobotToCamera(),
-                                    swerve::getRotation));
+                                    camera.getRobotToCamera()));
                 }
             }
 
@@ -138,7 +137,7 @@ public class Robot extends LoggedOpModeRobot {
                 }
             }
         }
-        vision = new Vision(swerve.visionConsumer, visionIOMap, swerve::getRotation);
+        vision = new Vision(swerve.visionConsumer, visionIOMap, swerve::getPose);
 
         configureDefaultCommands();
         configureButtonBindings();

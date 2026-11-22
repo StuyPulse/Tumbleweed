@@ -7,6 +7,7 @@ package com.stuypulse.robot.subsystems.vision;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 
+import com.limelightvision.DetectorTarget;
 import com.limelightvision.IMUMode;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -15,8 +16,7 @@ public interface VisionIO {
     @AutoLog
     class VisionIOInputs {
         public boolean connected = false;
-        public TargetObservation latestTargetObservation =
-                new TargetObservation(Rotation2d.ZERO, Rotation2d.ZERO);
+        public DetectorTarget[] objectDetections = new DetectorTarget[0];
         public PoseObservation[] poseObservations = new PoseObservation[0];
         public int[] tagIds = new int[0];
         public int currentPipeline = 0;

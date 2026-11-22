@@ -4,10 +4,12 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
+import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.Seconds;
 
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.units.measure.Distance;
 import org.wpilib.units.measure.Time;
 
 import com.limelightvision.IMUMode;
@@ -39,6 +41,10 @@ public interface VisionConstants {
         double BUZZ_DEBOUNCE = 0.25;
     }
 
+    interface BVCConstants {
+        Distance BUMPER_HEIGHT = Meters.of(0.1);
+    }
+
     record CameraData(String name, Transform3d robotToCamera, double stdDevFactor) {}
 
     /**
@@ -49,7 +55,12 @@ public interface VisionConstants {
      * </code>
      */
     public enum Camera {
-        ;
+        THE_WATCHER("limelight", new Transform3d(
+            12.860069,
+            3.104600,
+            -7.036811,
+            Rotation3d.ZERO
+        ), 1.0);
         private final CameraData data;
 
         /**

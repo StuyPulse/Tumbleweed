@@ -6,6 +6,7 @@ package com.stuypulse.robot.subsystems.vision;
 
 import com.stuypulse.robot.constants.FieldConstants;
 import com.stuypulse.robot.constants.GlobalSettings;
+import com.stuypulse.robot.subsystems.vision.VisionConstants.BVCConstants;
 import com.stuypulse.robot.subsystems.vision.VisionConstants.Camera;
 import com.stuypulse.robot.subsystems.vision.VisionConstants.CameraData;
 import com.stuypulse.robot.subsystems.vision.VisionConstants.Pipeline;
@@ -20,15 +21,24 @@ import org.wpilib.command3.Command;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
+import org.wpilib.math.util.Units;
 import org.wpilib.system.Timer;
 import org.wpilib.util.Alert;
 
+import com.limelightvision.DetectorTarget;
 import com.limelightvision.IMUMode;
 import com.limelightvision.Limelight;
+
+import static org.wpilib.units.Units.Meters;
+
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -44,19 +54,19 @@ public class Vision extends PeriodicSubsystem {
     private final EnumMap<Camera, VisionIOInputsAutoLogged> inputs;
     private final EnumMap<Camera, VisionIOOutputs> outputs;
     private final EnumMap<Camera, Alert> disconnectedAlerts;
-    private final Supplier<Rotation2d> rotationSupplier;
+    private final Supplier<Pose2d> poseSupplier;
 
     private final Timer hdrTimer;
 
     public Vision(
             VisionConsumer consumer,
             EnumMap<Camera, VisionIO> cameraIOMap,
-            Supplier<Rotation2d> rotationSupplier) {
+            Supplier<Pose2d> poseSupplier) {
         this.consumer = consumer;
 
         this.io = new EnumMap<>(cameraIOMap);
 
-        this.rotationSupplier = rotationSupplier;
+        this.poseSupplier = poseSupplier;
 
         // Initialize inputs
         this.inputs = new EnumMap<>(Camera.class);
@@ -80,13 +90,39 @@ public class Vision extends PeriodicSubsystem {
         hdrTimer.start();
     }
 
-    /**
-     * Returns the X angle to the best target, which can be used for simple servoing with vision.
-     *
-     * @param camera The camera to use
-     */
-    public Rotation2d getTargetX(Camera camera) {
-        return inputs.get(camera).latestTargetObservation.tx();
+    public Pose2d[] getCameraTargetPoses(Camera camera) {
+        DetectorTarget[] targets = inputs.get(camera).objectDetections;
+        ArrayList<Pose2d> calculatedPoses = new ArrayList<>();
+        Pose2d robotPose = poseSupplier.get();
+        for (int i = 0; i < targets.length; i++) {
+            Optional<Pose2d> pose = getTargetPose(targets[i], camera.getRobotToCamera(), robotPose);
+            if (pose.isPresent()) {
+                calculatedPoses.add(pose.get());
+            }
+        }
+        return calculatedPoses.toArray(Pose2d[]::new);
+    }
+
+    private Optional<Pose2d> getTargetPose(DetectorTarget target, Transform3d robotToCamera, Pose2d robotPose) {
+        final Translation3d cameraToTarget = new Translation3d(
+                1.0,
+                -Math.tan(Units.degreesToRadians(target.txDegrees)),
+                Math.tan(Units.degreesToRadians(target.tyDegrees)));
+
+        final Translation3d robotToTarget = cameraToTarget.rotateBy(robotToCamera.getRotation());
+
+        final double dz = BVCConstants.BUMPER_HEIGHT.in(Meters) - robotToCamera.getZ();
+        if (robotToTarget.getZ() * dz <= 0) {
+            return Optional.empty();
+        }
+
+        final double scale = dz / robotToTarget.getZ();
+        final Translation2d robotRelative = robotToCamera.getTranslation().toTranslation2d()
+                .plus(new Translation2d(robotToTarget.getX() * scale, robotToTarget.getY() * scale));
+
+        final Translation2d fieldRelative = robotPose.getTranslation()
+                .plus(robotRelative.rotateBy(robotPose.getRotation()));
+        return Optional.of(new Pose2d(fieldRelative, Rotation2d.ZERO));
     }
 
     public Optional<Integer> getPipeline() {
@@ -106,18 +142,16 @@ public class Vision extends PeriodicSubsystem {
             currentIO.updateInputs(currentInputs);
             Logger.processInputs("Vision/" + entry.getKey().getName(), currentInputs);
         }
-        Limelight.setSharedRobotOrientation(rotationSupplier.get().getDegrees());
-        Limelight.flushNT();
+        Limelight.setSharedRobotOrientation(poseSupplier.get().getRotation().getDegrees());
 
         Optional<Integer> pipeline = getPipeline();
 
         if (hdrTimer.hasElapsed(VisionConstants.VisionSettings.HDR_SWITCHING_INTERVAL)
                 && VisionConstants.VisionSettings.HDR_ENABLED.get()
                 && pipeline.isPresent()) {
-            int nextPipeline =
-                    pipeline.get() == Pipeline.HIGH_SUN.getIndex()
-                            ? Pipeline.LOW_SUN.getIndex()
-                            : Pipeline.HIGH_SUN.getIndex();
+            int nextPipeline = pipeline.get() == Pipeline.HIGH_SUN.getIndex()
+                    ? Pipeline.LOW_SUN.getIndex()
+                    : Pipeline.HIGH_SUN.getIndex();
 
             for (VisionIOOutputs outputs : outputs.values()) {
                 outputs.pipeline = nextPipeline;
@@ -157,23 +191,17 @@ public class Vision extends PeriodicSubsystem {
             // Loop over pose observations
             for (PoseObservation observation : currentInputs.poseObservations) {
                 // Check whether to reject pose
-                boolean rejectPose =
-                        observation.tagCount() == 0 // Must have at least one tag
-                                || (observation.tagCount() == 1
-                                        && observation.ambiguity()
-                                                > VisionSettings
-                                                        .MAX_AMBIGUITY) // Cannot be high ambiguity
-                                || Math.abs(observation.pose().getZ())
-                                        > VisionSettings
-                                                .MAX_Z_ERROR // Must have realistic Z coordinate
+                boolean rejectPose = observation.tagCount() == 0 // Must have at least one tag
+                        || (observation.tagCount() == 1
+                                && observation.ambiguity() > VisionSettings.MAX_AMBIGUITY) // Cannot be high ambiguity
+                        || Math.abs(observation.pose().getZ()) > VisionSettings.MAX_Z_ERROR // Must have realistic Z
+                                                                                            // coordinate
 
-                                // Must be within the field boundaries
-                                || observation.pose().getX() < 0.0
-                                || observation.pose().getX()
-                                        > FieldConstants.FIELD_LAYOUT.getFieldLength()
-                                || observation.pose().getY() < 0.0
-                                || observation.pose().getY()
-                                        > FieldConstants.FIELD_LAYOUT.getFieldWidth();
+                        // Must be within the field boundaries
+                        || observation.pose().getX() < 0.0
+                        || observation.pose().getX() > FieldConstants.FIELD_LAYOUT.getFieldLength()
+                        || observation.pose().getY() < 0.0
+                        || observation.pose().getY() > FieldConstants.FIELD_LAYOUT.getFieldWidth();
 
                 // Add pose to log
                 robotPoses.add(observation.pose());
@@ -189,8 +217,7 @@ public class Vision extends PeriodicSubsystem {
                 }
 
                 // Calculate standard deviations
-                double stdDevFactor =
-                        Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+                double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
                 double linearStdDev = VisionSettings.LINEAR_STD_DEV_BASELINE * stdDevFactor;
                 double angularStdDev = VisionSettings.ANGULAR_STD_DEV_BASELINE * stdDevFactor;
                 if (observation.type() == PoseObservationType.MEGATAG_2) {
@@ -260,51 +287,51 @@ public class Vision extends PeriodicSubsystem {
 
     public Command setPipeline(Pipeline pipeline) {
         return run(coroutine -> {
-                    for (VisionIOOutputs output : outputs.values()) {
-                        output.pipeline = pipeline.getIndex();
-                    }
-                })
+            for (VisionIOOutputs output : outputs.values()) {
+                output.pipeline = pipeline.getIndex();
+            }
+        })
                 .named("Vision Set " + pipeline.name() + " Pipeline");
     }
 
     public Command setMegaTagMode(MegaTagMode mode) {
         return run(coroutine -> {
-                    for (VisionIOOutputs output : outputs.values()) {
-                        output.megaTagMode = mode;
-                    }
-                })
+            for (VisionIOOutputs output : outputs.values()) {
+                output.megaTagMode = mode;
+            }
+        })
                 .named("Vision Set MegaTag Mode");
     }
 
     public Command setVisionEnabled() {
         return run(coroutine -> {
-                    this.enable();
-                })
+            this.enable();
+        })
                 .named("Vision Set Enabled");
     }
 
     public Command setVisionDisabled() {
         return run(coroutine -> {
-                    this.disable();
-                })
+            this.disable();
+        })
                 .named("Vision Set Enabled");
     }
 
     public Command setAprilTagWhitelist(int[] whitelist) {
         return run(coroutine -> {
-                    for (VisionIOOutputs output : outputs.values()) {
-                        output.aprilTagWhitelist = whitelist.clone();
-                    }
-                })
+            for (VisionIOOutputs output : outputs.values()) {
+                output.aprilTagWhitelist = whitelist.clone();
+            }
+        })
                 .named("Vision Set April Tag Whitelist");
     }
 
     private Command setIMUMode(IMUMode imuMode, String name) {
         return run(coroutine -> {
-                    for (VisionIOOutputs output : outputs.values()) {
-                        output.imuMode = imuMode;
-                    }
-                })
+            for (VisionIOOutputs output : outputs.values()) {
+                output.imuMode = imuMode;
+            }
+        })
                 .named(name);
     }
 
