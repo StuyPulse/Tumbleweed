@@ -87,7 +87,9 @@ public interface VisionConstants {
 
     public enum Pipeline {
         HIGH_SUN(0),
-        LOW_SUN(1);
+        LOW_SUN(1),
+        LAB(2),
+        BUMPER_DET(3);
 
         private final int index;
 

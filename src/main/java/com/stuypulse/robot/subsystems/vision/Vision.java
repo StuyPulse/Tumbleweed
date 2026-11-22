@@ -258,13 +258,13 @@ public class Vision extends PeriodicSubsystem {
         GlobalSettings.EnabledSubsystems.VISION.set(false);
     }
 
-    public Command setPipeline(int pipeline) {
+    public Command setPipeline(Pipeline pipeline) {
         return run(coroutine -> {
                     for (VisionIOOutputs output : outputs.values()) {
-                        output.pipeline = pipeline;
+                        output.pipeline = pipeline.getIndex();
                     }
                 })
-                .named("Vision Set Pipeline");
+                .named("Vision Set " + pipeline.name() + " Pipeline");
     }
 
     public Command setMegaTagMode(MegaTagMode mode) {
