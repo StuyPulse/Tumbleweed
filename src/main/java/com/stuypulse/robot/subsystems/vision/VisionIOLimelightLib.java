@@ -4,6 +4,7 @@
 /**************************************************************/
 package com.stuypulse.robot.subsystems.vision;
 
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform3d;
 
 import com.limelightvision.DetectorTarget;
@@ -47,7 +48,7 @@ public class VisionIOLimelightLib implements VisionIO {
         // Read new pose observations from NetworkTables
         Set<Integer> tagIds = new HashSet<>();
         List<PoseObservation> poseObservations = new LinkedList<>();
-        Set<DetectorTarget> detectorTargets = new HashSet<>();
+        Set<TargetObservation> detectorObservations = new HashSet<>();
 
         for (LimelightResults rawSample : camera.readResultsQueue()) {
             if (!rawSample.valid) { // ignore invalid results obv
@@ -57,11 +58,15 @@ public class VisionIOLimelightLib implements VisionIO {
                 tagIds.add(tag.fiducialId);
             }
             for (DetectorTarget detectorTarget : rawSample.detectorTargets) {
-                detectorTargets.add(detectorTarget);
+                detectorObservations.add(
+                        new TargetObservation(
+                                Rotation2d.fromDegrees(detectorTarget.txDegrees),
+                                Rotation2d.fromDegrees(detectorTarget.tyDegrees)));
             }
 
             double ambiguity = 0.0;
-            // Ambiguity, using only the first tag because ambiguity isn't applicable for multitag
+            // Ambiguity, using only the first tag because ambiguity isn't applicable for
+            // multitag
             if (megaTagMode == MegaTagMode.MEGATAG_1 && rawSample.fiducialTargets.length == 1) {
                 ambiguity = rawSample.fiducialTargets[0].ambiguity;
             }

@@ -55,12 +55,8 @@ public interface VisionConstants {
      * </code>
      */
     public enum Camera {
-        THE_WATCHER("limelight", new Transform3d(
-            12.860069,
-            3.104600,
-            -7.036811,
-            Rotation3d.ZERO
-        ), 1.0);
+        THE_WATCHER(
+                "limelight", new Transform3d(12.860069, 3.104600, -7.036811, Rotation3d.ZERO), 1.0);
         private final CameraData data;
 
         /**

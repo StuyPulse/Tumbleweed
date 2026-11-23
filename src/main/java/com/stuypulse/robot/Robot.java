@@ -26,6 +26,7 @@ import com.stuypulse.robot.subsystems.vision.VisionConstants;
 import com.stuypulse.robot.subsystems.vision.VisionConstants.Camera;
 import com.stuypulse.robot.subsystems.vision.VisionIO;
 import com.stuypulse.robot.subsystems.vision.VisionIOLimelightLib;
+import com.stuypulse.robot.util.PeriodicSubsystem;
 
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
@@ -103,9 +104,7 @@ public class Robot extends LoggedOpModeRobot {
                 for (Camera camera : VisionConstants.Camera.values()) {
                     visionIOMap.put(
                             camera,
-                            new VisionIOLimelightLib(
-                                    camera.getName(),
-                                    camera.getRobotToCamera()));
+                            new VisionIOLimelightLib(camera.getName(), camera.getRobotToCamera()));
                 }
             }
 
@@ -261,5 +260,6 @@ public class Robot extends LoggedOpModeRobot {
         Logger.AdvancedHooks.invokePeriodicBeforeUser();
         defaultScheduler.run();
         Logger.AdvancedHooks.invokePeriodicAfterUser(0, 0);
+        PeriodicSubsystem.runAllPeriodicAfterScheduler();
     }
 }
