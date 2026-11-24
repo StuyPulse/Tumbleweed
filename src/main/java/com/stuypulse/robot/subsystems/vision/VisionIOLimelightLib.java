@@ -106,6 +106,12 @@ public class VisionIOLimelightLib implements VisionIO {
         for (int id : tagIds) {
             inputs.tagIds[i++] = id;
         }
+
+        inputs.objectDetections = new TargetObservation[detectorObservations.size()];
+        i = 0;
+        for (TargetObservation object : detectorObservations) {
+            inputs.objectDetections[i++] = object;
+        }
     }
 
     @Override
